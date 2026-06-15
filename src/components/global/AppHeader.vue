@@ -32,11 +32,12 @@
         <li><router-link to="/services" class="nav-menu-cl" :class="{ 'home-link': isHomePage }">Услуги</router-link></li>
         <li><router-link to="/gallery" class="nav-menu-cl" :class="{ 'home-link': isHomePage }">Наши работы</router-link></li>
         <li><router-link to="/contacts" class="nav-menu-cl" :class="{ 'home-link': isHomePage }">Контакты</router-link></li>
+
       </ul>
 
       <div class="svet">
         <router-link to="/calculator" class="nav-menu-cl btn-calc" :class="{ 'home-link': isHomePage }">Калькулятор</router-link>
-        <router-link to="#" @click.prevent="openChat" class="nav-menu-cl btn-calc" :class="{ 'home-link': isHomePage }">Чат-бот</router-link>
+        <router-link to="#" @click.prevent="openChat" class="nav-menu-cl btn-calc me" :class="{ 'home-link': isHomePage }">Чат-бот</router-link>
         <div class="burger-icon" @click="isMobileMenuOpen = !isMobileMenuOpen">
           <span></span>
           <span></span>
@@ -55,6 +56,7 @@
 
           <li><router-link to="/gallery" class="burger-menu-cl" @click="isMobileMenuOpen = false">Наши работы</router-link></li>
           <li><router-link to="/contacts" class="burger-menu-cl" @click="isMobileMenuOpen = false">Контакты</router-link></li>
+
         </ul>
       </div>
     </div>
@@ -229,7 +231,9 @@ header {
   .desktop-menu {
     display: none;
   }
-
+    .me {
+      display: none;
+    }
   .burger-icon {
     display: flex;
   }

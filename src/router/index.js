@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'  // ← замени createWebHistory на createWebHashHistory
 
 import HomeView from '@/views/HomeView.vue'
 import ServicesView from '@/views/ServicesView.vue'
@@ -24,7 +24,7 @@ const routes = [
 ]
 
 const router = createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(),  // ← замени createWebHistory()
     routes,
     scrollBehavior() {
         return { top: 0 }

@@ -67,7 +67,12 @@
               <circle cx="12" cy="10" r="3" stroke="#2764AE" stroke-width="2"/>
             </svg> Адрес</h2>
             <div class="contact-item2">
-              <div class="contact-item2__icon"></div>
+              <div class="contact-item2__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 21V7L12 3L20 7V21H4Z" stroke="#2764AE" stroke-width="2" stroke-linejoin="round"/>
+                <rect x="9" y="11" width="6" height="5" stroke="#2764AE" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M9 21V16H15V21" stroke="#2764AE" stroke-width="2" stroke-linejoin="round"/>
+                <circle cx="12" cy="8" r="1" fill="#2764AE"/>
+              </svg></div>
               <div class="contact-item2__content">
                 <span class="contact-item2__label">Юридический адрес</span>
                 <span class="contact-item2__value">Нижегородская область, Городецкий район, село Зарубино</span>

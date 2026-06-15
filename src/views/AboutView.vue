@@ -87,21 +87,30 @@
           <h2 class="contact-info__title">Контактная информация</h2>
           <ul class="contact-details">
             <li class="contact-details__item">
-              <span class="contact-details__icon">👤</span>
+              <span class="contact-details__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="8" r="4" stroke="#2764AE" stroke-width="2"/>
+              <path d="M4 20C4 16 8 14 12 14C16 14 20 16 20 20" stroke="#2764AE" stroke-width="2" stroke-linecap="round"/>
+            </svg></span>
               <div class="contact-details__content">
                 <h4>ИП Глазунов</h4>
                 <p>Нижегородская область, Городецкий район, село Зарубино</p>
               </div>
             </li>
             <li class="contact-details__item">
-              <span class="contact-details__icon">📞</span>
+              <span class="contact-details__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="5" y="2" width="14" height="20" rx="2" stroke="#2764AE" stroke-width="2"/>
+                <path d="M12 18H12.01" stroke="#2764AE" stroke-width="2" stroke-linecap="round"/>
+              </svg></span>
               <div class="contact-details__content">
                 <h4>Телефон</h4>
                 <p><a href="tel:89200521982" class="contact-details__link">8 (920) 052-19-82</a></p>
               </div>
             </li>
             <li class="contact-details__item">
-              <span class="contact-details__icon">✉️</span>
+              <span class="contact-details__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="#2764AE" stroke-width="2"/>
+                <path d="M22 6L12 13L2 6" stroke="#2764AE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg></span>
               <div class="contact-details__content">
                 <h4>Электронная почта</h4>
                 <p><a href="mailto:nn.glazunov@yandex.ru" class="contact-details__link">nn.glazunov@yandex.ru</a></p>
