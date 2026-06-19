@@ -81,7 +81,7 @@
               <a href="services_prise.html#zayvka" class="action-button">
                 <div  class="action-button__text">Заказать расчёт</div>
                 <svg class="action-button__icon" viewBox="0 0 24 24" width="18" height="18">
-                  <path d="M9 18L15 12L9 6V18Z" fill="currentColor"/>
+                  <path d="M9 18L15 12L9 6V18Z" fill="white"/>
                 </svg>
               </a>
 
@@ -267,7 +267,9 @@
   margin: 25px auto;
 
 }
-
+.action-button__text {
+  color: white;
+}
 .full-service-banner {
   display: flex;
   overflow: hidden;
@@ -517,8 +519,7 @@
 }
 
 .action-button:hover {
-  background: #f1f5f9;
-  color: var(--lazur);
+
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }

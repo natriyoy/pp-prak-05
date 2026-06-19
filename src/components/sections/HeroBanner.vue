@@ -57,17 +57,116 @@
           <span class="mini-stat-label">предоплата</span>
         </div>
       </div>
+      <div class="quotes-block">
+        <transition name="quote-fade" mode="out-in">
+          <p class="quote-text" :key="currentIndex">
+            {{ quotes[currentIndex] }}
+          </p>
+        </transition>
+        <div class="quote-dots">
+    <span
+        v-for="(q, i) in quotes"
+        :key="i"
+        class="dot"
+        :class="{ active: i === currentIndex }"
+        @click="currentIndex = i"
+    ></span>
+        </div>
+      </div>
     </div>
+    <!-- Ротация цитат -->
+
   </section>
+
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+
+const quotes = [
+  'Не смыли бы — если бы не мы.',
+  'Без скважины человек — это 70% паники.',
+  'Все ищут смысл жизни. Мы просто нашли воду.',
+  'Эволюция вышла из воды. Вернуться придётся через нас.',
+  'Никто не помнит первый глоток воды. Запомнят последнюю скважину — нашу.',
+  'Жизнь начинается с воды. Вода начинается с нас.',
+  'Интернет иногда отключают. Воду — никогда. Мы знаем, что важнее.',
+  'Пароли меняются, сервисы блокируют, приложения пропадают. Скважина работает 5 лет гарантированно.',
+    'Коммунальщики обещают. Мы гарантируем.',
+    'Мудрость — это не ждать, когда дадут. А сделать самому.'
+]
+
+const currentIndex = ref(0)
+let timer = null
+
+onMounted(() => {
+  timer = setInterval(() => {
+    currentIndex.value = (currentIndex.value + 1) % quotes.length
+  }, 6000)
+})
+
+onUnmounted(() => {
+  clearInterval(timer)
+})
 function openChat() {
   window.dispatchEvent(new CustomEvent('open-faq-chat'))
 }
 </script>
 
 <style>
+.quotes-block {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  text-align: center;
+}
+
+.quote-text {
+  font-size: 1.15rem;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+  min-height: 3rem;
+  margin-bottom: 16px;
+  max-width:840px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.quote-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.dot.active {
+  background: white;
+}
+
+/* Анимация смены цитаты */
+.quote-fade-enter-active,
+.quote-fade-leave-active {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.quote-fade-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.quote-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
 .hero {
 
   margin-top: -90px;

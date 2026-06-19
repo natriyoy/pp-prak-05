@@ -175,14 +175,14 @@ function openLeadForm() {
   scrollDown()
 }
 
-function submitLead() {
+async function submitLead() {
   if (!leadName.value.trim() || !leadPhone.value.trim()) {
     leadError.value = 'Заполните имя и телефон'
     return
   }
   leadError.value = ''
 
-  addLead({
+  await addLead({
     name: leadName.value,
     phone: leadPhone.value,
     message: leadMessage.value,

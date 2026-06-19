@@ -1,38 +1,38 @@
-const STORAGE_KEY = 'bur52_leads'
+import { db } from '@/firebase'
+import {
+    collection, addDoc, getDocs, doc, updateDoc, deleteDoc,
+    query, orderBy, Timestamp
+} from 'firebase/firestore'
 
-export function getLeads() {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : []
-}
+const leadsCollection = collection(db, 'leads')
 
-export function addLead(lead) {
-    const leads = getLeads()
-    leads.unshift({
-        id: Date.now(),
-        date: new Date().toLocaleString('ru-RU'),
-        timestamp: Date.now(),
+export async function addLead(lead) {
+    await addDoc(leadsCollection, {
+        ...lead,
         status: 'new',
-        ...lead
+        timestamp: Date.now(),
+        date: new Date().toLocaleString('ru-RU')
     })
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(leads))
 }
 
-export function updateLeadStatus(id, status) {
-    const leads = getLeads().map(l => l.id === id ? { ...l, status } : l)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(leads))
+export async function getLeads() {
+    const q = query(leadsCollection, orderBy('timestamp', 'desc'))
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
 }
 
-export function deleteLead(id) {
-    const leads = getLeads().filter(l => l.id !== id)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(leads))
+export async function updateLeadStatus(id, status) {
+    const leadRef = doc(db, 'leads', id)
+    await updateDoc(leadRef, { status })
 }
 
-export function getNewLeadsCount() {
-    return getLeads().filter(l => l.status === 'new').length
+export async function deleteLead(id) {
+    const leadRef = doc(db, 'leads', id)
+    await deleteDoc(leadRef)
 }
 
-export function getStats() {
-    const leads = getLeads()
+export async function getStats() {
+    const leads = await getLeads()
     const now = Date.now()
     const day = 24 * 60 * 60 * 1000
 

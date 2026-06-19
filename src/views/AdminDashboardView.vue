@@ -53,9 +53,12 @@
         <option value="newest">Сначала новые</option>
         <option value="oldest">Сначала старые</option>
       </select>
+
+      <button class="btn-refresh" @click="loadData">↻ Обновить</button>
     </div>
 
-    <div v-if="filteredLeads.length === 0" class="empty">Заявок не найдено</div>
+    <div v-if="loading" class="empty">Загрузка заявок...</div>
+    <div v-else-if="filteredLeads.length === 0" class="empty">Заявок не найдено</div>
 
     <div v-else class="leads-list">
       <div v-for="lead in filteredLeads" :key="lead.id" class="lead-card">
@@ -82,19 +85,36 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getLeads, updateLeadStatus, deleteLead, getStats } from '@/utils/leads'
 import { logout } from '@/utils/auth'
 
 const router = useRouter()
-const leads = ref(getLeads())
-const stats = ref(getStats())
+
+const leads = ref([])
+const stats = ref({ total: 0, week: 0, month: 0, new: 0, inProgress: 0, done: 0 })
+const loading = ref(true)
 
 const statusFilter = ref('all')
 const dateFilter = ref('all')
 const sourceFilter = ref('all')
 const sortOrder = ref('newest')
+
+// Загрузка данных из Firestore
+async function loadData() {
+  loading.value = true
+  try {
+    leads.value = await getLeads()
+    stats.value = await getStats()
+  } catch (e) {
+    console.error('Ошибка загрузки заявок:', e)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(loadData)
 
 // Список уникальных источников для select
 const sources = computed(() => {
@@ -102,10 +122,9 @@ const sources = computed(() => {
   return Array.from(set)
 })
 
-// Получить timestamp заявки. Если его нет (старая заявка) — пробуем достать из id (Date.now()), иначе 0
+// Получить timestamp заявки. Если его нет — пробуем достать из id, иначе 0
 function getTimestamp(lead) {
   if (lead.timestamp) return lead.timestamp
-  if (typeof lead.id === 'number' && lead.id > 1000000000000) return lead.id
   return 0
 }
 
@@ -141,15 +160,22 @@ const filteredLeads = computed(() => {
   return result
 })
 
-function changeStatus(id, status) {
-  updateLeadStatus(id, status)
-  stats.value = getStats()
+async function changeStatus(id, status) {
+  try {
+    await updateLeadStatus(id, status)
+    stats.value = await getStats()
+  } catch (e) {
+    console.error('Ошибка изменения статуса:', e)
+  }
 }
 
-function remove(id) {
-  deleteLead(id)
-  leads.value = getLeads()
-  stats.value = getStats()
+async function remove(id) {
+  try {
+    await deleteLead(id)
+    await loadData()
+  } catch (e) {
+    console.error('Ошибка удаления заявки:', e)
+  }
 }
 
 function exportCSV() {
@@ -249,6 +275,17 @@ function handleLogout() {
   color: var(--tex, #475569);
 }
 
+.btn-refresh {
+  background: transparent;
+  border: 1px solid var(--border, #E2E8F0);
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--lazur, #2764AE);
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -290,6 +327,7 @@ function handleLogout() {
   gap: 10px;
   margin-bottom: 20px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .filter-select {
@@ -375,9 +413,10 @@ function handleLogout() {
 
   .filters {
     flex-direction: column;
+    align-items: stretch;
   }
 
-  .filter-select {
+  .filter-select, .btn-refresh {
     width: 100%;
   }
 }

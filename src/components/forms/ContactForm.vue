@@ -64,14 +64,14 @@ const message = ref('')
 const error = ref('')
 const submitted = ref(false)
 
-function handleSubmit() {
+async function handleSubmit() {
   if (!name.value.trim() || !phone.value.trim()) {
     error.value = 'Заполните имя и телефон'
     return
   }
   error.value = ''
 
-  addLead({
+  await addLead({
     name: name.value,
     phone: phone.value,
     message: message.value,
