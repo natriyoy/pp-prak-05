@@ -1,7 +1,7 @@
 import { db } from '@/firebase'
 import {
     collection, addDoc, getDocs, doc, updateDoc, deleteDoc,
-    query, orderBy, Timestamp
+    query, orderBy, where
 } from 'firebase/firestore'
 
 const leadsCollection = collection(db, 'leads')
@@ -10,20 +10,40 @@ export async function addLead(lead) {
     await addDoc(leadsCollection, {
         ...lead,
         status: 'new',
+        archived: false,
         timestamp: Date.now(),
         date: new Date().toLocaleString('ru-RU')
     })
 }
 
-export async function getLeads() {
+// Получить все заявки (не архивные, по умолчанию)
+export async function getLeads(includeArchived = false) {
     const q = query(leadsCollection, orderBy('timestamp', 'desc'))
     const snapshot = await getDocs(q)
-    return snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+    const all = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+    return includeArchived ? all : all.filter(l => !l.archived)
+}
+
+// Получить только архивные заявки
+export async function getArchivedLeads() {
+    const q = query(leadsCollection, orderBy('timestamp', 'desc'))
+    const snapshot = await getDocs(q)
+    return snapshot.docs.map(d => ({ id: d.id, ...d.data() })).filter(l => l.archived === true)
 }
 
 export async function updateLeadStatus(id, status) {
     const leadRef = doc(db, 'leads', id)
     await updateDoc(leadRef, { status })
+}
+
+export async function archiveLead(id) {
+    const leadRef = doc(db, 'leads', id)
+    await updateDoc(leadRef, { archived: true })
+}
+
+export async function unarchiveLead(id) {
+    const leadRef = doc(db, 'leads', id)
+    await updateDoc(leadRef, { archived: false })
 }
 
 export async function deleteLead(id) {
@@ -32,7 +52,7 @@ export async function deleteLead(id) {
 }
 
 export async function getStats() {
-    const leads = await getLeads()
+    const leads = await getLeads(false) // без архивных
     const now = Date.now()
     const day = 24 * 60 * 60 * 1000
 

@@ -22,6 +22,8 @@
 import PageChapter from '../components/sections/PageChapter.vue'
 import PriceCalculator from '../components/calculator/PriceCalculator.vue'
 import ContactForm from '../components/forms/ContactForm.vue'
+
+
 </script>
 
 <style>

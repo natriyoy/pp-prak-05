@@ -30,6 +30,16 @@
                 <label class="input-label">Сообщение</label>
                 <textarea v-model="message" class="textarea-field" placeholder="Например: интересует бурение на участке в Городецком районе"></textarea>
               </div>
+
+              <!-- Чекбокс приложения расчёта -->
+              <label class="calc-checkbox">
+                <input type="checkbox" v-model="attachCalc" :disabled="!hasCalculation">
+                <span>Приложить расчёт из калькулятора</span>
+              </label>
+              <p v-if="attachCalc && !hasCalculation" class="calc-warning">
+                Расчёт не найден. Сначала воспользуйтесь калькулятором на странице "Калькулятор".
+              </p>
+
               <p v-if="error" class="form-error">{{ error }}</p>
               <Button type="submit" variant="white" block>Отправить заявку</Button>
             </form>
@@ -47,7 +57,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Input from '@/components/ui/Input.vue'
 import Button from '@/components/ui/Button.vue'
 import { addLead } from '@/utils/leads'
@@ -64,24 +74,58 @@ const message = ref('')
 const error = ref('')
 const submitted = ref(false)
 
+const attachCalc = ref(false)
+const lastCalculation = ref(null)
+const hasCalculation = ref(false)
+
+// Проверяем, есть ли сохранённый расчёт из калькулятора
+onMounted(() => {
+  const raw = sessionStorage.getItem('bur52_last_calculation')
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw)
+      // Считаем калькулятор "не пустым", если глубина больше 0
+      if (parsed && parsed.depth > 0) {
+        lastCalculation.value = parsed
+        hasCalculation.value = true
+      }
+    } catch (e) {
+      hasCalculation.value = false
+    }
+  }
+})
+
 async function handleSubmit() {
   if (!name.value.trim() || !phone.value.trim()) {
     error.value = 'Заполните имя и телефон'
     return
   }
+
+  if (attachCalc.value && !hasCalculation.value) {
+    error.value = 'Нельзя приложить пустой расчёт — сначала воспользуйтесь калькулятором'
+    return
+  }
+
   error.value = ''
 
-  await addLead({
+  const leadData = {
     name: name.value,
     phone: phone.value,
     message: message.value,
     source: props.source
-  })
+  }
+
+  if (attachCalc.value && hasCalculation.value) {
+    leadData.calculation = lastCalculation.value
+  }
+
+  await addLead(leadData)
 
   submitted.value = true
   name.value = ''
   phone.value = ''
   message.value = ''
+  attachCalc.value = false
 }
 </script>
 
@@ -89,7 +133,31 @@ async function handleSubmit() {
 .contact-form-section {
   padding: 10px 0;
 }
+.calc-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 10px;
+  cursor: pointer;
+}
 
+.calc-checkbox input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.calc-checkbox input:disabled {
+  cursor: not-allowed;
+}
+
+.calc-warning {
+  font-size: 12px;
+  color: #FCD34D;
+  margin-bottom: 12px;
+}
 .container {
   max-width: 1200px;
   margin: 0 auto;

@@ -84,7 +84,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const depth = ref(50)
 const diameter = ref(125)
@@ -100,6 +100,24 @@ const extrasCost = computed(() => {
   return cost
 })
 const totalCost = computed(() => drillingCost.value + pipeCost.value + extrasCost.value)
+
+// Сохраняем расчёт в sessionStorage при любом изменении параметров,
+// чтобы форма заявки могла его подхватить
+function saveCalculationSnapshot() {
+  const extrasLabels = []
+  if (extras.value.pump) extrasLabels.push('Монтаж насоса')
+  if (extras.value.cleaning) extrasLabels.push('Чистка скважины')
+  if (extras.value.equipment) extrasLabels.push('Обустройство скважины')
+
+  sessionStorage.setItem('bur52_last_calculation', JSON.stringify({
+    depth: Number(depth.value),
+    diameter: Number(diameter.value),
+    extras: extrasLabels,
+    total: totalCost.value
+  }))
+}
+
+watch([depth, diameter, extras], saveCalculationSnapshot, { deep: true, immediate: true })
 </script>
 
 <style>
