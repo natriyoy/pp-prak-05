@@ -41,7 +41,14 @@
           <div class="form-wrapper">
             <form v-if="!submitted" @submit.prevent="handleSubmit" class="real-form">
               <Input v-model="name" label="Ваше имя" placeholder="Иван Иванов" />
-              <Input v-model="phone" type="tel" label="Телефон" placeholder="+7 (___) ___-__-__" />
+              <Input
+                  :model-value="phone"
+                  @update:model-value="phone = $event"
+                  type="tel"
+                  label="Телефон"
+                  placeholder="+7 (___) ___-__-__"
+                  maxlength="18"
+              />
               <div class="textarea-wrapper">
                 <label class="input-label">Сообщение</label>
                 <textarea v-model="message" class="textarea-field" placeholder="Например: интересует бурение на участке в Городецком районе"></textarea>
@@ -108,12 +115,14 @@ const props = defineProps({
 })
 
 const name = ref('')
-const phone = ref('')
+import { usePhoneMask } from '@/composables/usePhoneMask'
+
+const { phone, isPhoneValid } = usePhoneMask()
 const message = ref('')
 const error = ref('')
 const submitted = ref(false)
 
-const { attachCalc, hasCalculation,  onCalcCheckboxChange } = useCalculatorAttach()
+const { attachCalc, hasCalculation, getCurrentCalculation, onCalcCheckboxChange } = useCalculatorAttach()
 
 async function handleSubmit() {
   if (!name.value.trim() || !phone.value.trim()) {
@@ -121,6 +130,21 @@ async function handleSubmit() {
     return
   }
 
+  if (!isPhoneValid.value) {
+    error.value = 'Введите корректный номер телефона'
+    return
+  }
+  if (!name.value.trim() || !phone.value.trim()) {
+    error.value = 'Заполните имя и телефон'
+    return
+  }
+
+  const currentCalc = getCurrentCalculation()
+
+  if (attachCalc.value && !currentCalc) {
+    error.value = 'Нельзя приложить пустой расчёт — сначала воспользуйтесь калькулятором'
+    return
+  }
 
   error.value = ''
 
@@ -131,6 +155,9 @@ async function handleSubmit() {
     source: props.source
   }
 
+  if (attachCalc.value && currentCalc) {
+    leadData.calculation = currentCalc
+  }
 
   await addLead(leadData)
 

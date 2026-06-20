@@ -35,10 +35,38 @@
       </div>
 
       <!-- Форма заявки внутри чата -->
+      <!-- Форма заявки внутри чата -->
       <div v-if="showLeadForm" class="lead-form">
         <input v-model="leadName" type="text" placeholder="Ваше имя" class="lead-input">
-        <input v-model="leadPhone" type="tel" placeholder="Телефон" class="lead-input">
+        <input
+            :value="leadPhone"
+            @input="leadPhone = $event.target.value"
+            type="tel"
+            placeholder="+7 (___) ___-__-__"
+            class="lead-input"
+            maxlength="18"
+        >
         <textarea v-model="leadMessage" placeholder="Краткое описание вопроса (необязательно)" class="lead-textarea"></textarea>
+
+        <label class="lead-calc-checkbox" :class="{ disabled: !hasCalculation }">
+          <input
+              type="checkbox"
+              v-model="attachCalc"
+              :disabled="!hasCalculation"
+              @change="onCalcCheckboxChange"
+          >
+          <span>Приложить расчёт из калькулятора</span>
+
+          <!-- Tooltip-подсказка при наведении на неактивный чекбокс -->
+          <span v-if="!hasCalculation" class="lead-tooltip">
+    Сначала рассчитайте стоимость на странице калькулятора
+    <span class="lead-tooltip-arrow"></span>
+  </span>
+        </label>
+        <p v-if="attachCalc && !hasCalculation" class="lead-calc-warning">
+          Расчёт не найден. Сначала воспользуйтесь калькулятором.
+        </p>
+
         <p v-if="leadError" class="lead-error">{{ leadError }}</p>
         <button class="chat-lead-btn" @click="submitLead">Отправить</button>
       </div>
@@ -56,9 +84,9 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, onMounted, onUnmounted } from 'vue'
 import { addLead } from '@/utils/leads'
-import { onMounted, onUnmounted } from 'vue'
+import { useCalculatorAttach } from '@/composables/useCalculatorAttach'
 
 const isOpen = ref(false)
 const userInput = ref('')
@@ -69,9 +97,13 @@ const chatBody = ref(null)
 const showLeadForm = ref(false)
 const leadSubmitted = ref(false)
 const leadName = ref('')
-const leadPhone = ref('')
+import { usePhoneMask } from '@/composables/usePhoneMask'
+
+const { phone: leadPhone, isPhoneValid: isLeadPhoneValid } = usePhoneMask()
 const leadMessage = ref('')
 const leadError = ref('')
+
+const { attachCalc, hasCalculation, getCurrentCalculation, onCalcCheckboxChange } = useCalculatorAttach()
 
 const messages = ref([
   { from: 'bot', text: 'Здравствуйте! Я помогу ответить на частые вопросы о бурении скважин. Выберите вопрос ниже или напишите свой.' }
@@ -180,20 +212,44 @@ async function submitLead() {
     leadError.value = 'Заполните имя и телефон'
     return
   }
+
+  if (!isLeadPhoneValid.value) {
+    leadError.value = 'Введите корректный номер телефона'
+    return
+  }
+  if (!leadName.value.trim() || !leadPhone.value.trim()) {
+    leadError.value = 'Заполните имя и телефон'
+    return
+  }
+
+  const currentCalc = getCurrentCalculation()
+
+  if (attachCalc.value && !currentCalc) {
+    leadError.value = 'Нельзя приложить пустой расчёт — сначала воспользуйтесь калькулятором'
+    return
+  }
+
   leadError.value = ''
 
-  await addLead({
+  const leadData = {
     name: leadName.value,
     phone: leadPhone.value,
     message: leadMessage.value,
     source: 'Чат-бот'
-  })
+  }
+
+  if (attachCalc.value && currentCalc) {
+    leadData.calculation = currentCalc
+  }
+
+  await addLead(leadData)
 
   showLeadForm.value = false
   leadSubmitted.value = true
   leadName.value = ''
   leadPhone.value = ''
   leadMessage.value = ''
+  attachCalc.value = false
   scrollDown()
 }
 
@@ -207,6 +263,97 @@ function scrollDown() {
 </script>
 
 <style scoped>
+.lead-calc-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #475569;
+  cursor: pointer;
+  position: relative;
+}
+
+.lead-calc-checkbox input {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.lead-calc-checkbox.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.lead-calc-checkbox.disabled input {
+  cursor: not-allowed;
+}
+
+.lead-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  background: #1E293B;
+  color: white;
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 400;
+  white-space: normal;
+  max-width: 220px;
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.lead-tooltip-arrow {
+  position: absolute;
+  top: 100%;
+  left: 16px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #1E293B;
+}
+
+.lead-calc-checkbox.disabled:hover .lead-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+.lead-calc-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #475569;
+  cursor: pointer;
+}
+
+.lead-calc-checkbox input {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.lead-calc-checkbox.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.lead-calc-checkbox.disabled input {
+  cursor: not-allowed;
+}
+
+.lead-calc-warning {
+  font-size: 11px;
+  color: #DC2626;
+  margin: 0;
+}
 .chat-fab {
   position: fixed;
   bottom: 24px;

@@ -7,6 +7,7 @@
         :placeholder="placeholder"
         @input="$emit('update:modelValue', $event.target.value)"
         class="input-field"
+        v-bind="$attrs"
     />
   </div>
 </template>
@@ -19,6 +20,10 @@ defineProps({
   placeholder: { type: String, default: '' }
 })
 defineEmits(['update:modelValue'])
+
+defineOptions({
+  inheritAttrs: false
+})
 </script>
 
 <style>

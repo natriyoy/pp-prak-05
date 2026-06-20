@@ -80,7 +80,7 @@ const openChat = () => {
 header {
   z-index: 1000;
   padding-top: 20px;
-  padding-bottom: 20px;
+  padding-bottom: 40px;
   top: 0;
 }
 

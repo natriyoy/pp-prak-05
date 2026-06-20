@@ -7,9 +7,22 @@
           <span class="label-value">{{ depth }} м</span>
         </div>
         <div class="range-slider">
-          <input type="range" min="10" max="200" step="10" v-model.number="depth" class="slider" />
+          <input
+              type="range"
+              min="10"
+              max="200"
+              step="10"
+              v-model.number="depth"
+              class="slider"
+              ref="sliderRef"
+          />
           <div class="slider-ticks">
-            <span>10м</span><span>50м</span><span>100м</span><span>150м</span><span>200м</span>
+            <span
+                v-for="tick in tickMarks"
+                :key="tick.value"
+                class="tick-mark"
+                :style="{ left: tick.position + 'px' }"
+            >{{ tick.label }}</span>
           </div>
         </div>
       </div>
@@ -84,11 +97,12 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 
 const depth = ref(50)
 const diameter = ref(125)
 const extras = ref({ pump: false, cleaning: false, equipment: false })
+const sliderRef = ref(null)
 
 const drillingCost = computed(() => depth.value * 2500)
 const pipeCost = computed(() => diameter.value === 150 ? 5000 : 0)
@@ -101,7 +115,59 @@ const extrasCost = computed(() => {
 })
 const totalCost = computed(() => drillingCost.value + pipeCost.value + extrasCost.value)
 
-// Флаг "пользователь реально трогал калькулятор"
+// ===== Точное позиционирование подписей под слайдером =====
+// Нативный <input type="range"> двигает бегунок не от 0% до 100% ширины
+// контейнера, а в "полезном" диапазоне (ширина минус диаметр thumb).
+// Подписи считаются по той же формуле, что использует браузер
+// для позиционирования самого бегунка — тогда они совпадают пиксель в пиксель.
+
+const tickValues = [10, 50, 100, 150, 200]
+const tickMarks = ref(tickValues.map(v => ({ value: v, label: v + 'м', position: 0 })))
+
+const THUMB_WIDTH = 28
+const THUMB_WIDTH_MOBILE = 24
+const MOBILE_BREAKPOINT = 576
+
+function getThumbWidth() {
+  return window.innerWidth <= MOBILE_BREAKPOINT ? THUMB_WIDTH_MOBILE : THUMB_WIDTH
+}
+
+function recalcTickPositions() {
+  if (!sliderRef.value) return
+
+  const trackWidth = sliderRef.value.offsetWidth
+  const thumbWidth = getThumbWidth()
+  const usableWidth = trackWidth - thumbWidth
+  const min = 10
+  const max = 200
+
+  tickMarks.value = tickValues.map(v => {
+    const ratio = (v - min) / (max - min)
+    const position = thumbWidth / 2 + ratio * usableWidth
+    return { value: v, label: v + 'м', position }
+  })
+}
+
+let resizeObserver = null
+
+onMounted(() => {
+  nextTick(recalcTickPositions)
+
+  resizeObserver = new ResizeObserver(() => recalcTickPositions())
+  if (sliderRef.value) {
+    resizeObserver.observe(sliderRef.value)
+  }
+
+  window.addEventListener('resize', recalcTickPositions)
+})
+
+onUnmounted(() => {
+  if (resizeObserver) resizeObserver.disconnect()
+  window.removeEventListener('resize', recalcTickPositions)
+})
+
+// ===== Сохранение расчёта для форм заявки и чат-бота =====
+
 let userInteracted = false
 
 function saveCalculationSnapshot() {
@@ -117,12 +183,12 @@ function saveCalculationSnapshot() {
     total: totalCost.value,
     interacted: userInteracted
   }))
+
+  window.dispatchEvent(new CustomEvent('calculator-updated'))
 }
 
-// Сохраняем снимок сразу при загрузке (interacted: false — галочка нигде не активна)
 saveCalculationSnapshot()
 
-// При любом изменении параметров — взаимодействие засчитано
 watch([depth, diameter, extras], () => {
   userInteracted = true
   saveCalculationSnapshot()
@@ -192,6 +258,8 @@ watch([depth, diameter, extras], () => {
   border-radius: 3px;
   outline: none;
   cursor: pointer;
+  margin: 0;
+  display: block;
 }
 
 .slider::-webkit-slider-thumb {
@@ -212,28 +280,36 @@ watch([depth, diameter, extras], () => {
   border-color: #0F172A;
 }
 
+.slider::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid #2764AE;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(39, 100, 174, 0.3);
+  transition: all 0.3s ease;
+}
+
+.slider::-moz-range-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(39, 100, 174, 0.4);
+  border-color: #0F172A;
+}
+
 .slider-ticks {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
+  position: relative;
+  margin-top: 18px;
   font-size: 0.9rem;
   color: #475569;
+  height: 20px;
 }
 
-.slider-ticks span {
-  position: relative;
-  padding-top: 20px;
-}
-
-.slider-ticks span::before {
-  content: '';
+.tick-mark {
   position: absolute;
-  top: -5px;
-  left: 50%;
+  top: 0;
   transform: translateX(-50%);
-  width: 2px;
-  height: 10px;
-  background-color: rgba(60, 60, 59, 0.1);
+  white-space: nowrap;
 }
 
 .radio-group {
@@ -443,6 +519,11 @@ watch([depth, diameter, extras], () => {
     height: 24px;
   }
 
+  .slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+  }
+
   .radio-label, .checkbox-label {
     padding: 14px 16px;
   }
@@ -459,10 +540,6 @@ watch([depth, diameter, extras], () => {
 @media (max-width: 400px) {
   .slider-ticks {
     font-size: 0.8rem;
-  }
-
-  .slider-ticks span {
-    padding-top: 18px;
   }
 
   .radio-text, .checkbox-text {

@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 export function useCalculatorAttach() {
     const attachCalc = ref(false)
@@ -24,6 +24,21 @@ export function useCalculatorAttach() {
     function onCalcCheckboxChange() {
         hasCalculation.value = !!getCurrentCalculation()
     }
+
+    // Слушаем кастомное событие, которое будет диспатчить калькулятор
+    // при каждом изменении параметров — это даёт реальную реактивность
+    // между PriceCalculator.vue и формой, даже если они на одной странице
+    function handleCalcUpdate() {
+        hasCalculation.value = !!getCurrentCalculation()
+    }
+
+    onMounted(() => {
+        window.addEventListener('calculator-updated', handleCalcUpdate)
+    })
+
+    onUnmounted(() => {
+        window.removeEventListener('calculator-updated', handleCalcUpdate)
+    })
 
     return { attachCalc, hasCalculation, getCurrentCalculation, onCalcCheckboxChange }
 }
