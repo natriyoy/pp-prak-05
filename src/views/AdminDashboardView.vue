@@ -38,32 +38,36 @@
 
       <!-- Фильтры -->
       <div class="filters">
-        <select v-model="statusFilter" class="filter-select">
-          <option value="all">Все статусы</option>
-          <option value="new">Новые</option>
-          <option value="in_progress">В работе</option>
-          <option value="done">Завершённые</option>
-        </select>
+        <div class="filters-selects">
+          <select v-model="statusFilter" class="filter-select">
+            <option value="all">Все статусы</option>
+            <option value="new">Новые</option>
+            <option value="in_progress">В работе</option>
+            <option value="done">Завершённые</option>
+          </select>
 
-        <select v-model="dateFilter" class="filter-select">
-          <option value="all">За всё время</option>
-          <option value="today">Сегодня</option>
-          <option value="week">За неделю</option>
-          <option value="month">За месяц</option>
-        </select>
+          <select v-model="dateFilter" class="filter-select">
+            <option value="all">За всё время</option>
+            <option value="today">Сегодня</option>
+            <option value="week">За неделю</option>
+            <option value="month">За месяц</option>
+          </select>
 
-        <select v-model="sourceFilter" class="filter-select">
-          <option value="all">Все источники</option>
-          <option v-for="src in sources" :key="src" :value="src">{{ src }}</option>
-        </select>
+          <select v-model="sourceFilter" class="filter-select">
+            <option value="all">Все источники</option>
+            <option v-for="src in sources" :key="src" :value="src">{{ src }}</option>
+          </select>
 
-        <select v-model="sortOrder" class="filter-select">
-          <option value="newest">Сначала новые</option>
-          <option value="oldest">Сначала старые</option>
-        </select>
+          <select v-model="sortOrder" class="filter-select">
+            <option value="newest">Сначала новые</option>
+            <option value="oldest">Сначала старые</option>
+          </select>
+        </div>
 
-        <button class="btn-export" @click="exportCSV">Экспорт CSV</button>
-        <button class="btn-refresh" @click="loadData">↻ Обновить</button>
+        <div class="filters-actions">
+          <button class="btn-export" @click="exportCSV">Экспорт CSV</button>
+          <button class="btn-refresh" @click="loadData">↻ Обновить</button>
+        </div>
       </div>
 
       <div v-if="loading" class="empty">Загрузка заявок...</div>
@@ -283,21 +287,66 @@ async function remove(id, fromArchive = false) {
 }
 
 function exportCSV() {
-  const headers = ['ID', 'Имя', 'Телефон', 'Сообщение', 'Источник', 'Статус', 'Дата']
+  const headers = [
+    'ID',
+    'Имя',
+    'Телефон',
+    'Сообщение',
+    'Источник',
+    'Статус',
+    'Дата создания',
+    'Глубина (м)',
+    'Диаметр трубы (мм)',
+    'Доп. услуги',
+    'Стоимость по расчёту (₽)'
+  ]
+
   const statusLabels = { new: 'Новая', in_progress: 'В работе', done: 'Завершена' }
 
-  const rows = filteredLeads.value.map(l => [
-    l.id, l.name || '', l.phone || '',
-    (l.message || '').replace(/[\n,]/g, ' '),
-    l.source || '', statusLabels[l.status] || l.status, l.date
-  ])
+  const rows = filteredLeads.value.map(l => {
+    const calc = l.calculation || {}
 
-  const csvContent = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')
+    return [
+      l.id,
+      l.name || '',
+      l.phone || '',
+      (l.message || '').replace(/[\r\n]+/g, ' ').trim(),
+      l.source || '',
+      statusLabels[l.status] || l.status,
+      l.date || '',
+      calc.depth ?? '',
+      calc.diameter ?? '',
+      Array.isArray(calc.extras) && calc.extras.length ? calc.extras.join('; ') : '',
+      calc.total != null ? calc.total : ''
+    ]
+  })
+
+  // Экранирование: оборачиваем в кавычки и удваиваем внутренние кавычки (стандарт CSV/RFC 4180)
+  function escapeCell(cell) {
+    const str = String(cell ?? '')
+    return '"' + str.replace(/"/g, '""') + '"'
+  }
+
+  // Разделитель ";" — Excel в русской локали по умолчанию ожидает именно его
+  // для корректного автоматического разбиения по столбцам
+  const DELIMITER = ';'
+
+  const csvLines = [
+    headers.map(escapeCell).join(DELIMITER),
+    ...rows.map(row => row.map(escapeCell).join(DELIMITER))
+  ]
+
+  const csvContent = csvLines.join('\r\n')
+
   const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = `leads_${new Date().toISOString().slice(0, 10)}.csv`
+
+  const dateStr = new Date().toISOString().slice(0, 10)
+  const filterSuffix = statusFilter.value !== 'all' ? `_${statusFilter.value}` : ''
+  link.download = `Бур-52_заявки_${dateStr}${filterSuffix}.csv`
+
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
@@ -331,8 +380,62 @@ function handleLogout() {
 .stat-card.highlight .stat-value { color: var(--lazur, #2764AE); }
 .stat-label { font-size: 12px; color: var(--tex, #475569); margin-top: 4px; }
 
-.filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
-.filter-select { border: 1px solid var(--border, #E2E8F0); border-radius: 8px; padding: 8px 12px; font-size: 13px; font-family: inherit; background: white; cursor: pointer; }
+.filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filters-selects {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.filters-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.filter-select {
+  border: 1px solid var(--border, #E2E8F0);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  background: white;
+  cursor: pointer;
+}
+
+.btn-export {
+  background: var(--lazur, #2764AE);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.btn-refresh {
+  background: transparent;
+  border: 1px solid var(--border, #E2E8F0);
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--lazur, #2764AE);
+  white-space: nowrap;
+}
 .btn-export { background: var(--lazur, #2764AE); color: white; border: none; border-radius: 8px; padding: 8px 16px; cursor: pointer; font-weight: 600; font-size: 13px; }
 .btn-refresh { background: transparent; border: 1px solid var(--border, #E2E8F0); border-radius: 8px; padding: 8px 14px; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--lazur, #2764AE); }
 

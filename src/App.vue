@@ -1,26 +1,33 @@
 <template>
   <div id="app">
     <SplashScreen v-if="showSplash" @hide="showSplash = false" />
-    <AppHeader />
+    <AppHeader v-if="!isWelcomePage" />
     <main>
       <RouterView />
     </main>
-    <AppFooter />
-    <FaqChatbot />
+    <AppFooter v-if="!isWelcomePage" />
+    <FaqChatbot v-if="!isWelcomePage" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import AppHeader from './components/global/AppHeader.vue'
 import AppFooter from './components/global/AppFooter.vue'
 import FaqChatbot from './components/FaqChatbot.vue'
 import SplashScreen from './components/global/SplashScreen.vue'
 
+const route = useRoute()
+
+
 const showSplash = ref(false)
 
+// Проверяем страницу визитки по имени роута
+const isWelcomePage = computed(() => route.path.startsWith('/welcome'))
+
 onMounted(() => {
-  // Проверяем, был ли уже показан splash
+  // Показываем splash только если ещё не показывали в этой сессии
   const splashShown = sessionStorage.getItem('splashShown')
   if (!splashShown) {
     showSplash.value = true
@@ -30,8 +37,6 @@ onMounted(() => {
 </script>
 
 <style>
-
-
 /* Подсветка иконок при hover на карточке */
 .hover-lift:hover .svc-icon,
 .hover-lift:hover .stage-ico {
@@ -52,6 +57,7 @@ onMounted(() => {
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
 }
+
 :root {
   --lazur: #2764AE;
   --zag: #1E293B;

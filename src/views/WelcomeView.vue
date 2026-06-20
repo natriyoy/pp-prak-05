@@ -8,7 +8,7 @@
     <!-- Заголовок -->
     <div class="welcome-header" :class="{ visible: phase >= 1 }">
       <span class="welcome-label">Добро пожаловать</span>
-      <h1 class="welcome-title">Вам нашу визитку?</h1>
+      <h1 class="welcome-title">{{ currentGreeting }}</h1>
     </div>
 
     <!-- Цитата -->
@@ -48,6 +48,15 @@ import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()
 
+// Массив приветствий
+const greetings = [
+  'Ого, вы не выбросили визитку! Уже это заслуживает скважины.',
+  'Визитка выжила в вашем кармане? Мы тоже выживем без воды — но зачем?',
+  'Спасибо, что не сделали из визитки самолётик. Мы ценим.',
+  'Вы ввели ссылку вручную? Или визитка сама прыгнула в телефон?',
+  'Квест "найди сайт" пройден.'
+]
+
 const quotes = [
   'Не смыли бы — если бы не мы.',
   'Без скважины человек — это 70% паники.',
@@ -60,6 +69,11 @@ const quotes = [
   'Коммунальщики обещают. Мы гарантируем.',
   'Мудрость — это не ждать, когда дадут. А сделать самому.'
 ]
+
+// Случайное приветствие при каждом заходе
+const currentGreeting = computed(() => {
+  return greetings[Math.floor(Math.random() * greetings.length)]
+})
 
 const cardIndex = computed(() => {
   const n = parseInt(route.params.id, 10)
@@ -87,7 +101,7 @@ onMounted(() => {
 
   setTimeout(() => {
     router.push('/')
-  }, 900 + quoteDuration + 5000)
+  }, 900 + quoteDuration + 4000)
 })
 </script>
 
@@ -161,7 +175,7 @@ onMounted(() => {
 }
 
 .welcome-title {
-  font-size: 2.8rem;
+  font-size: 2rem;
   font-weight: 800;
   color: white;
   line-height: 1.1;
@@ -192,7 +206,7 @@ onMounted(() => {
 
 
 .quote-text {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-style: italic;
   color: white;
   line-height: 1.6;
