@@ -10,10 +10,12 @@ import ContactsView from '@/views/ContactsView.vue'
 import AdminLoginView from '@/views/AdminLoginView.vue'
 import AdminDashboardView from '@/views/AdminDashboardView.vue'
 import AdminSettingsView from '@/views/AdminSettingsView.vue'
+import WelcomeView from '@/views/WelcomeView.vue'
 import { adminGuard } from './guard'
 
 const routes = [
     { path: '/',            component: HomeView },
+    { path: '/welcome/:id', component: WelcomeView },
     { path: '/services',    component: ServicesView },
     { path: '/services-price', component: ServicesPriceView },
     { path: '/calculator',  component: CalculatorView },
