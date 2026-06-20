@@ -32,15 +32,24 @@
         <div v-for="u in users" :key="u.id" class="user-row">
           <span class="user-login">{{ u.login }}</span>
           <span class="user-role" :class="u.role">{{ u.role === 'admin' ? 'Администратор' : 'Менеджер' }}</span>
+          <button v-if="u.role === 'manager'" class="btn-delete-user" @click="askDeleteUser(u)">Удалить</button>
         </div>
       </div>
     </div>
+
+    <ConfirmModal
+        :visible="deleteUserModalVisible"
+        :text="`Удалить аккаунт менеджера «${pendingDeleteUser?.login}»?`"
+        @confirm="confirmDeleteUser"
+        @cancel="deleteUserModalVisible = false"
+    />
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { changePassword, registerUser, getAllUsers, getCurrentUser, isAdmin } from '@/utils/auth'
+import { changePassword, registerUser, getAllUsers, getCurrentUser, isAdmin, deleteUser } from '@/utils/auth'
+import ConfirmModal from '@/components/ConfirmModal.vue'
 
 const isAdminUser = isAdmin()
 
@@ -56,6 +65,9 @@ const regMessage = ref('')
 const regSuccess = ref(false)
 
 const users = ref([])
+
+const deleteUserModalVisible = ref(false)
+const pendingDeleteUser = ref(null)
 
 onMounted(async () => {
   if (isAdminUser) {
@@ -108,6 +120,19 @@ async function handleRegister() {
     users.value = await getAllUsers()
   }
 }
+
+function askDeleteUser(user) {
+  pendingDeleteUser.value = user
+  deleteUserModalVisible.value = true
+}
+
+async function confirmDeleteUser() {
+  if (!pendingDeleteUser.value) return
+  await deleteUser(pendingDeleteUser.value.id)
+  users.value = await getAllUsers()
+  deleteUserModalVisible.value = false
+  pendingDeleteUser.value = null
+}
 </script>
 
 <style scoped>
@@ -129,9 +154,20 @@ async function handleRegister() {
 .msg-error { color: #DC2626; }
 
 .users-list { display: flex; flex-direction: column; gap: 8px; }
-.user-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--bg, #F8FAFC); border-radius: 8px; }
+.user-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--bg, #F8FAFC); border-radius: 8px; gap: 10px; }
 .user-login { font-weight: 600; font-size: 13px; color: var(--zag, #1E293B); }
 .user-role { font-size: 11px; padding: 3px 10px; border-radius: 12px; font-weight: 600; }
 .user-role.admin { background: #FEE2E2; color: #991B1B; }
 .user-role.manager { background: #DBEAFE; color: #1E40AF; }
+
+.btn-delete-user {
+  border: 1px solid #FCA5A5;
+  background: #FEF2F2;
+  color: #DC2626;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: 600;
+}
 </style>

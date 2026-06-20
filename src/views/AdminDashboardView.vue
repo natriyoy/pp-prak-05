@@ -306,7 +306,7 @@ function exportCSV() {
 
 function handleLogout() {
   logout()
-  router.push('/')
+  router.push('/admin')
 }
 </script>
 

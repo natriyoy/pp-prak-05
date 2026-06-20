@@ -76,7 +76,7 @@ const services = [
     title: 'Бурение скважин на воду',
     price: 'от 2 500 ₽/метр',
     guarantee: '5 лет',
-    image: '/images/IMG20190801112509.jpg',
+    image: './images/IMG20190801112509.jpg',
     featuresTitle: 'Особенности услуги:',
     features: [
       'Глубина бурения до 150 метров',
@@ -102,7 +102,7 @@ const services = [
     title: 'Монтаж насосного оборудования',
     price: 'от 15 000 ₽',
     guarantee: '2 года',
-    image: '/images/nasos-v-kolodtse-3.jpg',
+    image: './images/nasos-v-kolodtse-3.jpg',
     featuresTitle: 'Что входит в услугу:',
     features: [
       'Подбор оптимального насоса',
@@ -125,7 +125,7 @@ const services = [
     title: 'Чистка и ремонт скважин',
     price: 'от 8 000 ₽',
     guarantee: '1 год',
-    image: '/images/image(44).png',
+    image: './images/image(44).png',
     featuresTitle: 'Что входит в услугу:',
     features: [
       'Диагностика состояния скважины',
@@ -149,7 +149,7 @@ const services = [
     title: 'Обустройство скважины',
     price: 'от 25 000 ₽',
     guarantee: '3 года',
-    image: '/images/diploma.webp',
+    image: './images/diploma.webp',
     featuresTitle: 'Что входит в обустройство:',
     features: [
       'Установка кессона или адаптера',
@@ -172,7 +172,7 @@ const services = [
     title: 'Промышленные скважины',
     price: 'от 5 000 ₽/метр',
     guarantee: '7 лет',
-    image: '/images/promyshlennaya.jpg',
+    image: './images/promyshlennaya.jpg',
     featuresTitle: 'Особенности услуги:',
     features: [
       'Глубина бурения до 300 метров и более',
@@ -200,7 +200,7 @@ const services = [
     title: 'Консультация специалиста',
     price: 'Бесплатно',
     guarantee: 'честные рекомендации',
-    image: '/images/glaz.jpg',
+    image: './images/glaz.jpg',
     featuresTitle: 'Что входит в консультацию:',
     features: [
       'Выезд на участок',

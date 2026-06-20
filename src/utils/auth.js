@@ -1,5 +1,5 @@
 import { db } from '@/firebase'
-import { collection, getDocs, addDoc, query, where, doc, updateDoc } from 'firebase/firestore'
+import { collection, getDocs, addDoc, query, where, doc, updateDoc,deleteDoc } from 'firebase/firestore'
 
 const usersCollection = collection(db, 'users')
 const SESSION_KEY = 'bur52_admin_session'
@@ -17,7 +17,9 @@ export async function ensureDefaultAdmin() {
         })
     }
 }
-
+export async function deleteUser(userId) {
+    await deleteDoc(doc(db, 'users', userId))
+}
 export async function login(loginValue, password) {
     const q = query(usersCollection, where('login', '==', loginValue), where('password', '==', password))
     const snapshot = await getDocs(q)

@@ -4,20 +4,36 @@
       <div class="form-container">
         <div class="form-intro">
           <h2 class="form-title">{{ title }}</h2>
-          <p v-if="subtitle" class="form-subtitle">{{ subtitle }}</p>
+          <p class="form-subtitle">{{ subtitle }}</p>
           <div class="form-benefits">
-            <div class="benefit-item"><span>⚡</span> <span class="benefit-content2">Быстрый ответ и выезд в день обращения</span></div>
-            <div class="benefit-item"><span>📝</span> <span class="benefit-content2">Составим прозрачную смету без скрытых платежей</span></div>
-            <div class="benefit-item"><span>🛡️</span> <span class="benefit-content2">Официальный договор и гарантия 5 лет</span></div>
-          </div>
-          <div class="form-stats">
-            <div class="stat-item">
-              <div class="stat-number">500+</div>
-              <div class="stat-text">Скважин пробурено</div>
+            <div class="benefit-item">
+              <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="30" cy="30" r="28" fill="#2764AE" opacity="0.1"/>
+                <path d="M32 15 L22 32 L29 32 L27 45 L38 28 L31 28 L32 15 Z" fill="#2764AE" stroke="#2764AE" stroke-width="1.5" stroke-linejoin="round"/>
+              </svg>
+              <span>Быстрый ответ и выезд в день обращения</span>
             </div>
-            <div class="stat-item">
-              <div class="stat-number">15</div>
-              <div class="stat-text">Лет на рынке</div>
+
+            <div class="benefit-item">
+              <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="30" cy="30" r="28" fill="#2764AE" opacity="0.1"/>
+                <rect x="18" y="16" width="24" height="30" rx="3" stroke="#2764AE" stroke-width="2"/>
+                <path d="M24 26 L36 26" stroke="#2764AE" stroke-width="2" stroke-linecap="round"/>
+                <path d="M24 32 L36 32" stroke="#2764AE" stroke-width="2" stroke-linecap="round"/>
+                <path d="M24 38 L30 38" stroke="#2764AE" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="38" cy="38" r="8" fill="#2764AE"/>
+                <path d="M35 38 L37 40 L41 36" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>Составим прозрачную смету без скрытых платежей</span>
+            </div>
+
+            <div class="benefit-item">
+              <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="30" cy="30" r="28" fill="#2764AE" opacity="0.1"/>
+                <path d="M30 15 L42 20 L42 32 C42 40 36 45 30 48 C24 45 18 40 18 32 L18 20 L30 15 Z" stroke="#2764AE" stroke-width="2" stroke-linejoin="round"/>
+                <path d="M25 30 L28 33 L35 26" stroke="#2764AE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>Официальный договор и гарантия 5 лет</span>
             </div>
           </div>
         </div>
@@ -31,14 +47,36 @@
                 <textarea v-model="message" class="textarea-field" placeholder="Например: интересует бурение на участке в Городецком районе"></textarea>
               </div>
 
-              <!-- Чекбокс приложения расчёта -->
-              <label class="calc-checkbox">
-                <input type="checkbox" v-model="attachCalc" :disabled="!hasCalculation">
-                <span>Приложить расчёт из калькулятора</span>
-              </label>
-              <p v-if="attachCalc && !hasCalculation" class="calc-warning">
-                Расчёт не найден. Сначала воспользуйтесь калькулятором на странице "Калькулятор".
-              </p>
+              <!-- Блок с чекбоксом и кнопкой перехода -->
+              <div class="calc-attach-row">
+                <label class="calc-checkbox" :class="{ disabled: !hasCalculation }">
+                  <input
+                      type="checkbox"
+                      v-model="attachCalc"
+                      :disabled="!hasCalculation"
+                      @change="onCalcCheckboxChange"
+                  >
+                  <span>Приложить расчёт из калькулятора</span>
+
+                  <!-- Tooltip-подсказка при наведении на неактивный чекбокс -->
+                  <span v-if="!hasCalculation" class="tooltip">
+                    Сначала рассчитайте стоимость на странице калькулятора
+                    <span class="tooltip-arrow"></span>
+                  </span>
+                </label>
+
+                <!-- Кнопка "Перейти" — появляется только когда расчёта нет -->
+                <router-link
+                    v-if="!hasCalculation"
+                    to="/calculator"
+                    class="calc-link"
+                >
+                  Перейти
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </router-link>
+              </div>
 
               <p v-if="error" class="form-error">{{ error }}</p>
               <Button type="submit" variant="white" block>Отправить заявку</Button>
@@ -57,15 +95,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
 import Input from '@/components/ui/Input.vue'
 import Button from '@/components/ui/Button.vue'
 import { addLead } from '@/utils/leads'
+import { useCalculatorAttach } from '@/composables/useCalculatorAttach'
+import { ref } from 'vue'
 
 const props = defineProps({
   title: { type: String, default: 'Обсудим ваш проект уже сегодня' },
   subtitle: { type: String, default: 'Оставьте заявку, и наш инженер свяжется с вами в течение 30 минут для бесплатной консультации.' },
-  source: { type: String, default: 'Главная страница' }
+  source: { type: String, default: 'Форма обратной связи' }
 })
 
 const name = ref('')
@@ -74,26 +113,7 @@ const message = ref('')
 const error = ref('')
 const submitted = ref(false)
 
-const attachCalc = ref(false)
-const lastCalculation = ref(null)
-const hasCalculation = ref(false)
-
-// Проверяем, есть ли сохранённый расчёт из калькулятора
-onMounted(() => {
-  const raw = sessionStorage.getItem('bur52_last_calculation')
-  if (raw) {
-    try {
-      const parsed = JSON.parse(raw)
-      // Считаем калькулятор "не пустым", если глубина больше 0
-      if (parsed && parsed.depth > 0) {
-        lastCalculation.value = parsed
-        hasCalculation.value = true
-      }
-    } catch (e) {
-      hasCalculation.value = false
-    }
-  }
-})
+const { attachCalc, hasCalculation,  onCalcCheckboxChange } = useCalculatorAttach()
 
 async function handleSubmit() {
   if (!name.value.trim() || !phone.value.trim()) {
@@ -101,10 +121,6 @@ async function handleSubmit() {
     return
   }
 
-  if (attachCalc.value && !hasCalculation.value) {
-    error.value = 'Нельзя приложить пустой расчёт — сначала воспользуйтесь калькулятором'
-    return
-  }
 
   error.value = ''
 
@@ -115,9 +131,6 @@ async function handleSubmit() {
     source: props.source
   }
 
-  if (attachCalc.value && hasCalculation.value) {
-    leadData.calculation = lastCalculation.value
-  }
 
   await addLead(leadData)
 
@@ -133,31 +146,7 @@ async function handleSubmit() {
 .contact-form-section {
   padding: 10px 0;
 }
-.calc-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.85);
-  margin-bottom: 10px;
-  cursor: pointer;
-}
 
-.calc-checkbox input {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-}
-
-.calc-checkbox input:disabled {
-  cursor: not-allowed;
-}
-
-.calc-warning {
-  font-size: 12px;
-  color: #FCD34D;
-  margin-bottom: 12px;
-}
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -203,41 +192,10 @@ async function handleSubmit() {
   margin-bottom: 40px;
 }
 
-.benefit-content2 {
-  color: #475569;
-}
-
 .benefit-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-weight: 500;
-}
-
-.form-stats {
-  display: flex;
-  gap: 30px;
-  margin-top: auto;
-  padding-top: 20px;
-  border-top: 1px solid rgba(39, 100, 174, 0.1);
-}
-
-.stat-item {
-  text-align: center;
-  flex: 1;
-}
-
-.stat-number {
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: #2764AE;
-  line-height: 1;
-  margin-bottom: 5px;
-}
-
-.stat-text {
-  font-size: 0.9rem;
-  color: #475569;
   font-weight: 500;
 }
 
@@ -295,6 +253,112 @@ async function handleSubmit() {
   box-shadow: 0 0 0 3px rgba(39, 100, 174, 0.1);
 }
 
+/* ===== Блок с чекбоксом и кнопкой перехода ===== */
+.calc-attach-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.calc-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  position: relative;
+}
+
+.calc-checkbox input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.calc-checkbox.disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.calc-checkbox.disabled input {
+  cursor: not-allowed;
+}
+
+/* ===== Tooltip ===== */
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 70%;
+  transform: translateX(-50%);
+  background: #1E293B;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.tooltip-arrow {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #1E293B;
+}
+
+/* Показываем tooltip только при наведении на неактивный чекбокс */
+.calc-checkbox.disabled:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ===== Кнопка "Перейти" ===== */
+.calc-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.calc-link:hover {
+  background: white;
+  color: #2764AE;
+  border-color: white;
+}
+
+.calc-link:hover svg {
+  transform: translateX(2px);
+}
+
+.calc-link svg {
+  transition: transform 0.2s ease;
+}
+
+/* ===== Ошибки и успех ===== */
 .form-error {
   color: #FCA5A5;
   background: rgba(255,255,255,0.1);
@@ -342,12 +406,12 @@ async function handleSubmit() {
   padding: 0 10px;
 }
 
+/* ===== Адаптивность ===== */
 @media (max-width: 1024px) {
   .form-container { gap: 30px; }
   .form-intro, .contact-form { padding: 40px 30px; }
   .form-title { font-size: 1.8rem; }
   .form-subtitle { font-size: 1rem; }
-  .stat-number { font-size: 1.8rem; }
   .form-wrapper { min-height: 450px; }
 }
 
@@ -358,7 +422,24 @@ async function handleSubmit() {
   .form-title { font-size: 1.6rem; text-align: center; }
   .form-subtitle { text-align: center; }
   .form-benefits { gap: 12px; margin-bottom: 30px; }
-  .form-stats { justify-content: space-around; gap: 20px; }
   .form-wrapper { min-height: 400px; }
+
+  /* На мобильных tooltip показываем по центру экрана */
+  .tooltip {
+    left: 0;
+    transform: translateX(0);
+    white-space: normal;
+    max-width: 220px;
+    text-align: center;
+  }
+
+  .tooltip-arrow {
+    left: 20px;
+  }
+
+  .calc-attach-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 </style>

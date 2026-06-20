@@ -18,7 +18,7 @@ defineProps({
 defineEmits(['click'])
 </script>
 
-<style>
+<style scoped>
 .btn {
   display: inline-flex;
   align-items: center;
@@ -32,6 +32,7 @@ defineEmits(['click'])
   transition: all 0.3s ease;
   border: 2px solid transparent;
   font-family: inherit;
+  line-height: 1;
 }
 
 .btn-primary {
@@ -41,8 +42,11 @@ defineEmits(['click'])
 }
 
 .btn-primary:hover {
-  background-color: transparent;
-  color: #2764AE;
+  background-color: #1E3A8A;
+  border-color: #1E3A8A;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(39, 100, 174, 0.3);
 }
 
 .btn-secondary {
@@ -54,6 +58,7 @@ defineEmits(['click'])
 .btn-secondary:hover {
   background-color: #2764AE;
   color: white;
+  transform: translateY(-2px);
 }
 
 .btn-white {
@@ -64,7 +69,9 @@ defineEmits(['click'])
 
 .btn-white:hover {
   transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  background-color: #f8fafc;
+  color: #1E3A8A;
 }
 
 .btn-outline-white {
@@ -76,14 +83,27 @@ defineEmits(['click'])
 .btn-outline-white:hover {
   background-color: white;
   color: #2764AE;
+  transform: translateY(-2px);
 }
 
 .btn-block {
   width: 100%;
+  display: flex;
 }
 
 .btn-small {
   padding: 10px 20px;
   font-size: 0.9rem;
+}
+
+/* Отключаем hover на мобильных */
+@media (max-width: 768px) {
+  .btn-primary:hover,
+  .btn-secondary:hover,
+  .btn-white:hover,
+  .btn-outline-white:hover {
+    transform: none;
+    box-shadow: none;
+  }
 }
 </style>

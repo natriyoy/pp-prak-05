@@ -176,7 +176,10 @@
       </div>
     </div>
 
-    <FeedbackForm />
+    <ContactForm
+        title="Подайте заявку"
+        subtitle="Заполните форму и мы свяжемся с вами в течение 30 минут"
+    />
   </div>
 </template>
 

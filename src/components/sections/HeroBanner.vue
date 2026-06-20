@@ -192,39 +192,41 @@ function openChat() {
   z-index: 1;
 }
 
-/* Анимированные капли воды */
+/* Анимированные капли воды — падают сверху вниз */
 .hero-drops {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  overflow: hidden;
 }
 
 .drop {
   position: absolute;
-  bottom: -40px;
+  top: -30px;
   width: 10px;
-  height: 10px;
-  background: rgba(255, 255, 255, 0.18);
-  border-radius: 50% 50% 50% 0;
-  transform: rotate(45deg);
-  animation: rise linear infinite;
+  height: 14px;
+  /* Форма капли остриём вниз (без rotate) */
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation: fall linear infinite;
 }
 
-.drop:nth-child(1) { left: 6%;  width: 14px; height: 14px; animation-duration: 9s;  animation-delay: 0s; }
-.drop:nth-child(2) { left: 18%; width: 8px;  height: 8px;  animation-duration: 7s;  animation-delay: 1.5s; }
-.drop:nth-child(3) { left: 32%; width: 18px; height: 18px; animation-duration: 11s; animation-delay: 0.5s; }
-.drop:nth-child(4) { left: 47%; width: 10px; height: 10px; animation-duration: 8s;  animation-delay: 3s; }
-.drop:nth-child(5) { left: 61%; width: 12px; height: 12px; animation-duration: 10s; animation-delay: 2s; }
-.drop:nth-child(6) { left: 74%; width: 16px; height: 16px; animation-duration: 9s;  animation-delay: 4s; }
-.drop:nth-child(7) { left: 86%; width: 9px;  height: 9px;  animation-duration: 7.5s; animation-delay: 1s; }
-.drop:nth-child(8) { left: 95%; width: 13px; height: 13px; animation-duration: 12s; animation-delay: 3.5s; }
+/* Разные размеры, скорости и задержки для каждой капли */
+.drop:nth-child(1) { left: 6%;  width: 12px; height: 16px; animation-duration: 9s;  animation-delay: 0s; }
+.drop:nth-child(2) { left: 18%; width: 8px;  height: 11px; animation-duration: 7s;  animation-delay: 1.5s; }
+.drop:nth-child(3) { left: 32%; width: 16px; height: 22px; animation-duration: 11s; animation-delay: 0.5s; }
+.drop:nth-child(4) { left: 47%; width: 10px; height: 14px; animation-duration: 8s;  animation-delay: 3s; }
+.drop:nth-child(5) { left: 61%; width: 14px; height: 19px; animation-duration: 10s; animation-delay: 2s; }
+.drop:nth-child(6) { left: 74%; width: 11px; height: 15px; animation-duration: 9s;  animation-delay: 4s; }
+.drop:nth-child(7) { left: 86%; width: 9px;  height: 12px; animation-duration: 7.5s; animation-delay: 1s; }
+.drop:nth-child(8) { left: 95%; width: 13px; height: 18px; animation-duration: 12s; animation-delay: 3.5s; }
 
-@keyframes rise {
-  0%   { transform: translateY(0) rotate(45deg); opacity: 0; }
-  10%  { opacity: 0.6; }
-  90%  { opacity: 0.3; }
-  100% { transform: translateY(-110vh) rotate(45deg); opacity: 0; }
+@keyframes fall {
+  0%   { transform: translateY(0); opacity: 0; }
+  10%  { opacity: 0.7; }
+  90%  { opacity: 0.4; }
+  100% { transform: translateY(110vh); opacity: 0; }
 }
 
 .hero-content {

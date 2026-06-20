@@ -7,7 +7,7 @@
           <span class="label-value">{{ depth }} м</span>
         </div>
         <div class="range-slider">
-          <input type="range" min="10" max="200" step="10" v-model="depth" class="slider" />
+          <input type="range" min="10" max="200" step="10" v-model.number="depth" class="slider" />
           <div class="slider-ticks">
             <span>10м</span><span>50м</span><span>100м</span><span>150м</span><span>200м</span>
           </div>
@@ -20,12 +20,12 @@
         </div>
         <div class="radio-group">
           <label class="radio-label" :class="{ active: diameter === 125 }">
-            <input type="radio" value="125" v-model="diameter" hidden />
+            <input type="radio" :value="125" v-model="diameter" hidden />
             <span class="radio-text">125 мм</span>
             <span class="radio-price">+ 0 ₽</span>
           </label>
           <label class="radio-label" :class="{ active: diameter === 150 }">
-            <input type="radio" value="150" v-model="diameter" hidden />
+            <input type="radio" :value="150" v-model="diameter" hidden />
             <span class="radio-text">150 мм</span>
             <span class="radio-price">+ 5 000 ₽</span>
           </label>
@@ -101,8 +101,9 @@ const extrasCost = computed(() => {
 })
 const totalCost = computed(() => drillingCost.value + pipeCost.value + extrasCost.value)
 
-// Сохраняем расчёт в sessionStorage при любом изменении параметров,
-// чтобы форма заявки могла его подхватить
+// Флаг "пользователь реально трогал калькулятор"
+let userInteracted = false
+
 function saveCalculationSnapshot() {
   const extrasLabels = []
   if (extras.value.pump) extrasLabels.push('Монтаж насоса')
@@ -113,11 +114,19 @@ function saveCalculationSnapshot() {
     depth: Number(depth.value),
     diameter: Number(diameter.value),
     extras: extrasLabels,
-    total: totalCost.value
+    total: totalCost.value,
+    interacted: userInteracted
   }))
 }
 
-watch([depth, diameter, extras], saveCalculationSnapshot, { deep: true, immediate: true })
+// Сохраняем снимок сразу при загрузке (interacted: false — галочка нигде не активна)
+saveCalculationSnapshot()
+
+// При любом изменении параметров — взаимодействие засчитано
+watch([depth, diameter, extras], () => {
+  userInteracted = true
+  saveCalculationSnapshot()
+}, { deep: true })
 </script>
 
 <style>
