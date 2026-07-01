@@ -32,7 +32,7 @@
           </svg> Позвонить нам
         </a>
         <button class="btn2 btn-chat hover-scale" @click="openChat">
-          💬 Задать вопрос
+          ? Задать вопрос
         </button>
       </div>
 
