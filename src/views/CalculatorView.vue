@@ -1,6 +1,6 @@
 <template>
 
-  <div class="calculator-page">
+  <div class="calculator-page anim-blur">
     <div class="container">
       <PageChapter
           subtitle="Онлайн калькулятор"
@@ -22,7 +22,8 @@
 import PageChapter from '../components/sections/PageChapter.vue'
 import PriceCalculator from '../components/calculator/PriceCalculator.vue'
 import ContactForm from '../components/forms/ContactForm.vue'
-
+import { useScrollReveal } from '@/composables/useScrollReveal'
+useScrollReveal()
 
 </script>
 

@@ -3,7 +3,11 @@
     <SplashScreen v-if="showSplash" @hide="showSplash = false" />
     <AppHeader v-if="!isWelcomePage" />
     <main>
-      <RouterView />
+      <router-view v-slot="{ Component, route }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" :key="route.path" />
+        </transition>
+      </router-view>
     </main>
     <AppFooter v-if="!isWelcomePage" />
     <FaqChatbot v-if="!isWelcomePage" />
@@ -20,14 +24,11 @@ import SplashScreen from './components/global/SplashScreen.vue'
 
 const route = useRoute()
 
-
 const showSplash = ref(false)
 
-// Проверяем страницу визитки по имени роута
 const isWelcomePage = computed(() => route.path.startsWith('/welcome'))
 
 onMounted(() => {
-  // Показываем splash только если ещё не показывали в этой сессии
   const splashShown = sessionStorage.getItem('splashShown')
   if (!splashShown) {
     showSplash.value = true
@@ -37,6 +38,23 @@ onMounted(() => {
 </script>
 
 <style>
+/* ===== ПЛАВНЫЙ ПЕРЕХОД МЕЖДУ СТРАНИЦАМИ ===== */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-18px);
+}
+
+/* ===== ОСТАЛЬНЫЕ СТИЛИ ===== */
 /* Подсветка иконок при hover на карточке */
 .hover-lift:hover .svc-icon,
 .hover-lift:hover .stage-ico {
@@ -48,14 +66,6 @@ onMounted(() => {
 .hover-lift:hover .stage-ico svg {
   stroke: white;
   transition: stroke 0.25s ease;
-}
-
-/* Плавный переход между страницами роутера */
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.25s ease;
-}
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
 }
 
 :root {

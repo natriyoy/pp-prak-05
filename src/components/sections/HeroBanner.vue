@@ -115,7 +115,6 @@ function openChat() {
 <style scoped>
 /* Герой секция */
 .hero {
-  margin-top: -106px;
   position: relative;
   min-height: 100vh;
   display: flex;
@@ -126,6 +125,8 @@ function openChat() {
   padding: 100px 20px;
   background: linear-gradient(135deg, #1E3A8A 0%, #2764AE 100%);
   overflow: hidden;
+  margin-top: -106px;
+  padding-top: 160px;
 }
 
 .hero-overlay {
@@ -380,8 +381,11 @@ function openChat() {
 /* Адаптив */
 @media (max-width: 768px) {
   .hero {
-    margin-top: 0;
-    padding: 80px 16px;
+    margin-top: -106px;
+    padding-top: 130px;
+    min-height: 100vh;
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   .hero h1 {
@@ -421,6 +425,12 @@ function openChat() {
 }
 
 @media (max-width: 480px) {
+  .hero {
+    margin-top: -106px;
+    padding-top: 110px;
+    min-height: 100vh;
+  }
+
   .hero h1 {
     font-size: 1.5rem;
   }

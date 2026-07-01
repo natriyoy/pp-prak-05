@@ -1,14 +1,19 @@
 <template>
   <div class="services-page">
     <div class="container">
+      <section class="anim-blur">
+
       <PageChapter
           subtitle="Наша специализация"
           title="Все услуги"
           description="Полный спектр услуг по водоснабжению от проектирования до обслуживания"
       />
-
+      </section>
       <div class="services-detail-list">
+
         <div class="service-detail" v-for="(service, index) in services" :key="index">
+          <section class="anim-blur">
+
           <div class="service-detail__header">
             <span class="service-detail__number">0{{ index + 1 }}</span>
             <h2 class="service-detail__title">{{ service.title }}</h2>
@@ -48,8 +53,10 @@
               <router-link to="/contacts" class="service-detail__cta">{{ service.ctaText }}</router-link>
             </div>
           </div>
+            </section>
         </div>
       </div>
+      <section class="anim-blur">
 
       <div class="services-cta-block">
         <div class="cta-content">
@@ -58,19 +65,23 @@
           <router-link to="/contacts" class="cta-button">Оставить заявку</router-link>
         </div>
       </div>
+      </section>
     </div>
+    <section class="anim-blur">
 
     <ContactForm
         title="Остались вопросы?"
         subtitle="Заполните форму и мы свяжемся с вами в течение 30 минут"
     />
+      </section>
   </div>
 </template>
 
 <script setup>
 import PageChapter from '../components/sections/PageChapter.vue'
 import ContactForm from '../components/forms/ContactForm.vue'
-
+import { useScrollReveal } from '@/composables/useScrollReveal'
+useScrollReveal()
 const services = [
   {
     title: 'Бурение скважин на воду',

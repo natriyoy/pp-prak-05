@@ -14,3 +14,25 @@
 body {
   background: #0A1C2E;
 }
+/* Scroll reveal — базовое состояние (скрыто) */
+/* Анимация с размытием */
+.anim-blur {
+  opacity: 0;
+  filter: blur(8px);
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, filter 0.6s ease, transform 0.6s ease;
+}
+
+.anim-blur.go {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+}
+
+.anim-blur:nth-child(2).go {
+  transition-delay: 0.12s;
+}
+
+.anim-blur:nth-child(3).go {
+  transition-delay: 0.24s;
+}

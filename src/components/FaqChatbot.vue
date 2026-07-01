@@ -1,6 +1,6 @@
 <template>
   <!-- Кнопка-подсказка в углу -->
-  <button class="chat-fab" @click="isOpen = !isOpen">
+  <button class="chat-fab" @click="toggleChat">
     <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="30" cy="30" r="28" fill="#2764AE" opacity="0.1"/>
       <path d="M18 20 C18 18 20 16 22 16 L38 16 C40 16 42 18 42 20 L42 34 C42 36 40 38 38 38 L30 38 L24 44 L24 38 L22 38 C20 38 18 36 18 34 L18 20 Z" stroke="#2764AE" stroke-width="2" stroke-linejoin="round"/>
@@ -10,83 +10,85 @@
     </svg>
   </button>
 
-  <!-- Модальное окно чата -->
-  <div v-if="isOpen" class="chat-window">
-    <div class="chat-header">
-      <span>Помощник Бур-52</span>
-      <button class="chat-close" @click="isOpen = false">×</button>
-    </div>
-
-    <div class="chat-body" ref="chatBody">
-      <div v-for="(msg, i) in messages" :key="i" :class="['chat-msg', msg.from]">
-        {{ msg.text }}
+  <!-- Модальное окно чата с анимацией -->
+  <Transition name="chat-fade" >
+    <div v-if="isOpen" class="chat-window">
+      <div class="chat-header">
+        <span>Помощник Бур-52</span>
+        <button class="chat-close" @click="isOpen = false">×</button>
       </div>
 
-      <!-- Быстрые кнопки с вопросами -->
-      <div v-if="showQuickButtons" class="quick-buttons">
-        <button v-for="(q, i) in quickQuestions" :key="i" class="quick-btn" @click="askQuick(q)">
-          {{ q.label }}
-        </button>
-      </div>
+      <div class="chat-body" ref="chatBody">
+        <div v-for="(msg, i) in messages" :key="i" :class="['chat-msg', msg.from]">
+          {{ msg.text }}
+        </div>
 
-      <!-- Кнопка "оставить заявку" -->
-      <div v-if="showLeadButton && !showLeadForm" class="chat-msg bot">
-        <button class="chat-lead-btn" @click="openLeadForm">Оставить заявку</button>
-      </div>
+        <!-- Быстрые кнопки с вопросами -->
+        <div v-if="showQuickButtons" class="quick-buttons">
+          <button v-for="(q, i) in quickQuestions" :key="i" class="quick-btn" @click="askQuick(q)">
+            {{ q.label }}
+          </button>
+        </div>
 
-      <!-- Форма заявки внутри чата -->
-      <!-- Форма заявки внутри чата -->
-      <div v-if="showLeadForm" class="lead-form">
-        <input v-model="leadName" type="text" placeholder="Ваше имя" class="lead-input">
-        <input
-            :value="leadPhone"
-            @input="leadPhone = $event.target.value"
-            type="tel"
-            placeholder="+7 (___) ___-__-__"
-            class="lead-input"
-            maxlength="18"
-        >
-        <textarea v-model="leadMessage" placeholder="Краткое описание вопроса (необязательно)" class="lead-textarea"></textarea>
+        <!-- Кнопка "оставить заявку" -->
+        <div v-if="showLeadButton && !showLeadForm" class="chat-msg bot">
+          <button class="chat-lead-btn" @click="openLeadForm">Оставить заявку</button>
+        </div>
 
-        <label class="lead-calc-checkbox" :class="{ disabled: !hasCalculation }">
+        <!-- Форма заявки внутри чата -->
+        <div v-if="showLeadForm" class="lead-form">
+          <input v-model="leadName" type="text" placeholder="Ваше имя" class="lead-input">
           <input
-              type="checkbox"
-              v-model="attachCalc"
-              :disabled="!hasCalculation"
-              @change="onCalcCheckboxChange"
+              :value="leadPhone"
+              @input="leadPhone = $event.target.value"
+              type="tel"
+              placeholder="+7 (___) ___-__-__"
+              class="lead-input"
+              maxlength="18"
           >
-          <span>Приложить расчёт из калькулятора</span>
+          <textarea v-model="leadMessage" placeholder="Краткое описание вопроса (необязательно)" class="lead-textarea"></textarea>
 
-          <!-- Tooltip-подсказка при наведении на неактивный чекбокс -->
-          <span v-if="!hasCalculation" class="lead-tooltip">
-    Сначала рассчитайте стоимость на странице калькулятора
-    <span class="lead-tooltip-arrow"></span>
-  </span>
-        </label>
-        <p v-if="attachCalc && !hasCalculation" class="lead-calc-warning">
-          Расчёт не найден. Сначала воспользуйтесь калькулятором.
-        </p>
+          <label class="lead-calc-checkbox" :class="{ disabled: !hasCalculation }">
+            <input
+                type="checkbox"
+                v-model="attachCalc"
+                :disabled="!hasCalculation"
+                @change="onCalcCheckboxChange"
+            >
+            <span>Приложить расчёт из калькулятора</span>
 
-        <p v-if="leadError" class="lead-error">{{ leadError }}</p>
-        <button class="chat-lead-btn" @click="submitLead">Отправить</button>
+            <!-- Tooltip-подсказка при наведении на неактивный чекбокс -->
+            <span v-if="!hasCalculation" class="lead-tooltip">
+              Сначала рассчитайте стоимость на странице калькулятора
+              <span class="lead-tooltip-arrow"></span>
+            </span>
+          </label>
+          <p v-if="attachCalc && !hasCalculation" class="lead-calc-warning">
+            Расчёт не найден. Сначала воспользуйтесь калькулятором.
+          </p>
+
+          <p v-if="leadError" class="lead-error">{{ leadError }}</p>
+          <button class="chat-lead-btn" @click="submitLead">Отправить</button>
+        </div>
+
+        <div v-if="leadSubmitted" class="chat-msg bot">
+          Спасибо! Заявка принята, мы свяжемся с вами в ближайшее время.
+        </div>
       </div>
 
-      <div v-if="leadSubmitted" class="chat-msg bot">
-        Спасибо! Заявка принята, мы свяжемся с вами в ближайшее время.
-      </div>
+      <form class="chat-input" @submit.prevent="sendMessage">
+        <input v-model="userInput" type="text" placeholder="Задайте вопрос...">
+        <button type="submit">➤</button>
+      </form>
     </div>
-
-    <form class="chat-input" @submit.prevent="sendMessage">
-      <input v-model="userInput" type="text" placeholder="Задайте вопрос...">
-      <button type="submit">➤</button>
-    </form>
-  </div>
+  </Transition>
 </template>
 
 <script setup>
 import { ref, nextTick, onMounted, onUnmounted } from 'vue'
 import { addLead } from '@/utils/leads'
 import { useCalculatorAttach } from '@/composables/useCalculatorAttach'
+import { usePhoneMask } from '@/composables/usePhoneMask'
 
 const isOpen = ref(false)
 const userInput = ref('')
@@ -97,8 +99,6 @@ const chatBody = ref(null)
 const showLeadForm = ref(false)
 const leadSubmitted = ref(false)
 const leadName = ref('')
-import { usePhoneMask } from '@/composables/usePhoneMask'
-
 const { phone: leadPhone, isPhoneValid: isLeadPhoneValid } = usePhoneMask()
 const leadMessage = ref('')
 const leadError = ref('')
@@ -117,17 +117,7 @@ const quickQuestions = [
   { label: 'Глубина скважин', text: 'какая глубина бурения' },
   { label: 'Предоплата', text: 'нужна ли предоплата' }
 ]
-function handleOpenChat() {
-  isOpen.value = true
-}
 
-onMounted(() => {
-  window.addEventListener('open-faq-chat', handleOpenChat)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('open-faq-chat', handleOpenChat)
-})
 const faq = [
   {
     keywords: ['цена', 'стоимость', 'сколько стоит', 'почем', 'тариф'],
@@ -162,6 +152,22 @@ const faq = [
     answer: 'Телефон: 8 (920) 052-19-82. Также можно оставить заявку, и мы свяжемся с вами сами.'
   }
 ]
+
+function toggleChat() {
+  isOpen.value = !isOpen.value
+}
+
+function handleOpenChat() {
+  isOpen.value = true
+}
+
+onMounted(() => {
+  window.addEventListener('open-faq-chat', handleOpenChat)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('open-faq-chat', handleOpenChat)
+})
 
 function askQuick(q) {
   messages.value.push({ from: 'user', text: q.label })
@@ -217,10 +223,6 @@ async function submitLead() {
     leadError.value = 'Введите корректный номер телефона'
     return
   }
-  if (!leadName.value.trim() || !leadPhone.value.trim()) {
-    leadError.value = 'Заполните имя и телефон'
-    return
-  }
 
   const currentCalc = getCurrentCalculation()
 
@@ -263,6 +265,40 @@ function scrollDown() {
 </script>
 
 <style scoped>
+/* ===== АНИМАЦИЯ ПОЯВЛЕНИЯ ЧАТА ===== */
+.chat-fade-enter-active {
+  animation: chatSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.chat-fade-leave-active {
+  animation: chatSlideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes chatSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes chatSlideDown {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+}
+
+/* ===== ОСТАЛЬНЫЕ СТИЛИ ===== */
 .lead-calc-checkbox {
   display: flex;
   align-items: center;
@@ -325,35 +361,13 @@ function scrollDown() {
   opacity: 1;
   visibility: visible;
 }
-.lead-calc-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: #475569;
-  cursor: pointer;
-}
-
-.lead-calc-checkbox input {
-  width: 14px;
-  height: 14px;
-  cursor: pointer;
-}
-
-.lead-calc-checkbox.disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.lead-calc-checkbox.disabled input {
-  cursor: not-allowed;
-}
 
 .lead-calc-warning {
   font-size: 11px;
   color: #DC2626;
   margin: 0;
 }
+
 .chat-fab {
   position: fixed;
   bottom: 24px;
@@ -361,13 +375,20 @@ function scrollDown() {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-
- background: none;
+  background: none;
   border: none;
   font-size: 24px;
   cursor: pointer;
-
   z-index: 999;
+  transition: transform 0.3s ease;
+}
+
+.chat-fab:hover {
+  transform: scale(1.1);
+}
+
+.chat-fab:active {
+  transform: scale(0.95);
 }
 
 .chat-window {
@@ -383,6 +404,7 @@ function scrollDown() {
   flex-direction: column;
   z-index: 999;
   overflow: hidden;
+  transform-origin: bottom right;
 }
 
 .chat-header {
@@ -403,6 +425,11 @@ function scrollDown() {
   font-size: 22px;
   cursor: pointer;
   line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+.chat-close:hover {
+  transform: rotate(90deg);
 }
 
 .chat-body {
@@ -453,12 +480,13 @@ function scrollDown() {
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s ease;
 }
 
 .quick-btn:hover {
   border-color: var(--lazur, #2764AE);
   background: rgba(39,100,174,0.05);
+  transform: translateX(4px);
 }
 
 .chat-lead-btn {
@@ -470,6 +498,12 @@ function scrollDown() {
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.chat-lead-btn:hover {
+  background: #1E3A8A;
+  transform: scale(1.02);
 }
 
 .lead-form {
@@ -489,6 +523,7 @@ function scrollDown() {
   font-size: 13px;
   font-family: inherit;
   outline: none;
+  transition: border-color 0.3s ease;
 }
 
 .lead-input:focus, .lead-textarea:focus {
@@ -520,6 +555,10 @@ function scrollDown() {
   outline: none;
 }
 
+.chat-input input::placeholder {
+  color: #94A3B8;
+}
+
 .chat-input button {
   background: var(--lazur, #2764AE);
   color: white;
@@ -527,5 +566,37 @@ function scrollDown() {
   width: 50px;
   font-size: 17px;
   cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.chat-input button:hover {
+  background: #1E3A8A;
+}
+
+/* ===== АДАПТИВ ===== */
+@media (max-width: 480px) {
+  .chat-window {
+    width: calc(100% - 32px);
+    max-height: 80vh;
+    bottom: 80px;
+    right: 16px;
+  }
+
+  .chat-body {
+    max-height: 50vh;
+    min-height: 240px;
+  }
+
+  .chat-fab {
+    width: 48px;
+    height: 48px;
+    bottom: 16px;
+    right: 16px;
+  }
+
+  .chat-fab svg {
+    width: 48px;
+    height: 48px;
+  }
 }
 </style>

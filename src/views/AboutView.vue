@@ -1,13 +1,17 @@
 <template>
   <div class="about-page">
     <div class="container">
+      <section class="anim-blur">
+
       <PageChapter
           subtitle="Профессионалы с 2008 года"
           title="О компании «Бур-52»"
           description="Более 15 лет успешной работы в области бурения скважин на воду в Нижегородской области"
       />
-
+      </section>
       <div class="about-content">
+        <section class="anim-blur">
+
         <div class="about-section">
           <h2 class="about-section__title">Наша история</h2>
           <div class="about-section__content">
@@ -16,8 +20,11 @@
             <p>Надежность, профессионализм и долгосрочные гарантии — основа нашей работы. За 15 лет деятельности мы выполнили более 500 успешных проектов, заслужив доверие клиентов по всей Нижегородской области.</p>
           </div>
         </div>
+</section>
+        <section class="anim-blur">
 
-        <div class="about-section">
+        <div class="about-section ">
+
           <h2 class="about-section__title">Почему выбирают нас</h2>
           <div class="about-section__content">
             <p>Мы строим долгосрочные отношения с клиентами, основываясь на качестве работы и прозрачности взаимодействия. Вот что отличает нас от конкурентов:</p>
@@ -46,6 +53,8 @@
             </div>
           </div>
         </div>
+        </section>
+        <section class="anim-blur">
 
         <div class="about-section">
           <h2 class="about-section__title">Кому мы помогаем</h2>
@@ -61,6 +70,8 @@
             </ul>
           </div>
         </div>
+</section>
+        <section class="anim-blur">
 
         <div class="about-section">
           <h2 class="about-section__title">География работ</h2>
@@ -82,6 +93,8 @@
             <p>Готовы рассмотреть возможность работы и в других районах Нижегородской области. Для уточнения возможности выезда свяжитесь с нами по телефону.</p>
           </div>
         </div>
+</section>
+        <section class="anim-blur">
 
         <div class="contact-info">
           <h2 class="contact-info__title">Контактная информация</h2>
@@ -118,6 +131,7 @@
             </li>
           </ul>
         </div>
+        </section>
 
         <div class="cta-section">
           <h2 class="cta-title">Нужна консультация по бурению скважины?</h2>
@@ -142,6 +156,8 @@ import PageChapter from '../components/sections/PageChapter.vue'
 import RegionBadge from '../components/common/RegionBadge.vue'
 import ContactForm from '../components/forms/ContactForm.vue'
 import FeedbackForm from "@/components/forms/FeedbackForm.vue";
+import { useScrollReveal } from '@/composables/useScrollReveal'
+useScrollReveal()
 </script>
 
 <style>

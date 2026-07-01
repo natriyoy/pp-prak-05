@@ -14,7 +14,10 @@
 
     <div class="container">
       <div class="contact-content">
+        <section class="anim-blur">
+
         <div class="contact-card">
+
           <div class="contact-card__section">
             <h2 class="contact-card__title"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="8" r="4" stroke="#2764AE" stroke-width="2"/>
@@ -93,6 +96,7 @@
             </div>
           </div>
 
+
           <div class="contact-card__section">
             <h2 class="contact-card__title"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M22 16.92V19.92C22 20.48 21.56 20.93 21 20.97C20.5 21 20 21 19.5 20.97C10.56 20.43 3.57 13.44 3.03 4.5C3 4 3 3.5 3.03 3C3.07 2.44 3.52 2 4.08 2H7.08C7.56 2 7.97 2.34 8.05 2.81C8.14 3.38 8.3 3.93 8.52 4.45C8.7 4.87 8.58 5.36 8.24 5.66L7.05 6.85C8.47 9.64 10.36 11.53 13.15 12.95L14.34 11.76C14.64 11.42 15.13 11.3 15.55 11.48C16.07 11.7 16.62 11.86 17.19 11.95C17.66 12.03 18 12.44 18 12.92V15.92C18 16.48 17.56 16.93 17 16.97C16.5 17 16 17 15.5 16.97C10.56 16.43 7.57 13.44 7.03 4.5C7 4 7 3.5 7.03 3C7.07 2.44 7.52 2 8.08 2H11.08C11.56 2 11.97 2.34 12.05 2.81C12.14 3.38 12.3 3.93 12.52 4.45C12.7 4.87 12.58 5.36 12.24 5.66L11.05 6.85C12.47 9.64 14.36 11.53 17.15 12.95L18.34 11.76C18.64 11.42 19.13 11.3 19.55 11.48C20.07 11.7 20.62 11.86 21.19 11.95C21.66 12.03 22 12.44 22 12.92V15.92" stroke="#2764AE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -108,6 +112,8 @@
               </div>
             </div>
           </div>
+
+
 
           <div class="contact-card__section">
             <h2 class="contact-card__title"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -126,8 +132,9 @@
             </div>
           </div>
         </div>
+        </section>
+        <div class="info-grid anim-blur" >
 
-        <div class="info-grid">
           <div class="info-grid__card">
             <div class="info-grid__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="12" r="9" stroke="#2764AE" stroke-width="2"/>
@@ -139,6 +146,8 @@
               Позвонить
             </a>
           </div>
+
+
 
           <div class="info-grid__card">
             <div class="info-grid__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -164,6 +173,7 @@
             </router-link>
           </div>
         </div>
+        <section class="anim-blur">
 
         <div class="contact-legal">
           <h3 class="contact-legal__title">Правовая информация</h3>
@@ -173,19 +183,24 @@
             На все виды работ предоставляется официальная гарантия.
           </p>
         </div>
+        </section>
       </div>
     </div>
+    <section class="anim-blur">
 
     <ContactForm
         title="Подайте заявку"
         subtitle="Заполните форму и мы свяжемся с вами в течение 30 минут"
     />
+    </section>
   </div>
 </template>
 
 <script setup>
 import ContactForm from '../components/forms/ContactForm.vue'
 import FeedbackForm from "@/components/forms/FeedbackForm.vue";
+import { useScrollReveal } from '@/composables/useScrollReveal'
+useScrollReveal()
 </script>
 
 <style>
