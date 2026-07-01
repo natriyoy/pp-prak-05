@@ -56,7 +56,6 @@
 
           <li><router-link to="/gallery" class="burger-menu-cl" @click="isMobileMenuOpen = false">Наши работы</router-link></li>
           <li><router-link to="/contacts" class="burger-menu-cl" @click="isMobileMenuOpen = false">Контакты</router-link></li>
-
         </ul>
       </div>
     </div>
@@ -160,7 +159,7 @@ header {
 .burger-icon span {
   height: 3px;
   width: 100%;
-  background: #ffffff;
+  background: #2764AE;
   border-radius: 3px;
   transition: all 0.3s ease;
 }

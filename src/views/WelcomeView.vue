@@ -26,7 +26,6 @@
     <!-- Бренд -->
     <div class="brand-tag" :class="{ visible: phase >= 3 }">
       <div class="brand-line"></div>
-
       <span class="brand-sub">бурение скважин на воду</span>
       <div class="brand-line"></div>
     </div>
@@ -98,10 +97,9 @@ onMounted(() => {
 
   const quoteDuration = quoteWords.value.length * 80 + 400
   setTimeout(() => { phase.value = 3 }, 900 + quoteDuration)
-
   setTimeout(() => {
-    router.push('/')
-  }, 900 + quoteDuration + 4000)
+      router.push('/')
+    }, 900 + quoteDuration + 4000)
 })
 </script>
 
@@ -115,7 +113,7 @@ onMounted(() => {
   justify-content: center;
   padding: 40px 24px;
   position: relative;
-  overflow: visible; /* ← было hidden, стало visible */
+  overflow: visible;
 }
 
 /* Декоративные капли на фоне */
@@ -152,6 +150,8 @@ onMounted(() => {
   transform: translateY(-20px);
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1;
+  width: 100%;
+  max-width: 600px;
 }
 
 .welcome-header.visible {
@@ -178,32 +178,33 @@ onMounted(() => {
   font-size: 2rem;
   font-weight: 800;
   color: white;
-  line-height: 1.1;
+  line-height: 1.3;
   margin: 0;
   background: linear-gradient(135deg, #FFFFFF 0%, #60A5FA 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  word-wrap: break-word;
 }
 
-/* Цитата — без границ и кавычек */
+/* Цитата — ИСПРАВЛЕНО */
 .quote-block {
+  width: 100%;
   max-width: 600px;
   text-align: center;
   margin-bottom: 40px;
-  padding: 20px 0; /* ← ДОБАВЛЕНО: место для translateY */
+  padding: 20px 16px;
   z-index: 1;
   opacity: 0;
   transform: translateY(20px);
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  overflow: visible; /* ← Явно разрешаем переполнение */
+  box-sizing: border-box;
 }
 
 .quote-block.visible {
   opacity: 1;
   transform: translateY(0);
 }
-
 
 .quote-text {
   font-size: 1.4rem;
@@ -212,17 +213,22 @@ onMounted(() => {
   line-height: 1.6;
   font-weight: 400;
   margin: 0;
-  overflow: visible; /* ← ДОБАВЛЕНО */
+  overflow: visible;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.15em 0.25em;
 }
 
 .quote-word {
   display: inline-block;
   opacity: 0;
-  filter: blur(4px); /* ← УМЕНЬШЕНО с 8px до 4px */
-  transform: translateY(8px); /* ← УМЕНЬШЕНО с 10px до 8px */
+  filter: blur(4px);
+  transform: translateY(8px);
   animation: word-appear 0.5s forwards;
-  margin-right: 0.25em;
-  will-change: transform, opacity, filter; /* ← ДОБАВЛЕНО: оптимизация */
+  will-change: transform, opacity, filter;
+  white-space: nowrap;
 }
 
 .quote-word:last-child {
@@ -260,16 +266,10 @@ onMounted(() => {
   background: linear-gradient(90deg, transparent, #60A5FA, transparent);
 }
 
-.brand-name {
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: #60A5FA;
-  letter-spacing: 0.1em;
-}
-
 .brand-sub {
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
 }
 
 /* Нижний блок */
@@ -322,12 +322,21 @@ onMounted(() => {
 
 /* Адаптив */
 @media (max-width: 640px) {
+  .welcome-screen {
+    padding: 20px 16px;
+  }
+
   .welcome-title {
-    font-size: 2rem;
+    font-size: 1.6rem;
   }
 
   .quote-text {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
+  }
+
+  .quote-block {
+    padding: 16px 12px;
+    max-width: 100%;
   }
 
   .brand-tag {
@@ -337,6 +346,24 @@ onMounted(() => {
 
   .brand-line {
     width: 30px;
+  }
+
+  .brand-sub {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 400px) {
+  .welcome-title {
+    font-size: 1.3rem;
+  }
+
+  .quote-text {
+    font-size: 0.95rem;
+  }
+
+  .quote-block {
+    padding: 12px 8px;
   }
 }
 </style>

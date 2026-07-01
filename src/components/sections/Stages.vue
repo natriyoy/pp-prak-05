@@ -72,7 +72,7 @@
 
     </div>
     <div class="stages-footer">
-      <a href="services_prise.html#zayvka" class="services-cta">Обсудить мой проект</a>
+      <router-link to="/contacts" class="services-cta">Обсудить мой проект</router-link>
     </div>
   </section>
 

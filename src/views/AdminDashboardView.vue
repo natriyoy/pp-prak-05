@@ -62,11 +62,12 @@
             <option value="newest">Сначала новые</option>
             <option value="oldest">Сначала старые</option>
           </select>
+          <button class="btn-export" @click="exportCSV">Экспорт</button>
+          <button class="btn-refresh" @click="loadData">Обновить</button>
         </div>
 
         <div class="filters-actions">
-          <button class="btn-export" @click="exportCSV">Экспорт CSV</button>
-          <button class="btn-refresh" @click="loadData">↻ Обновить</button>
+
         </div>
       </div>
 
@@ -389,6 +390,8 @@ function handleLogout() {
 }
 
 .filters-selects {
+  justify-content: space-between;
+
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
@@ -434,7 +437,7 @@ function handleLogout() {
   font-weight: 600;
   font-size: 13px;
   color: var(--lazur, #2764AE);
-  white-space: nowrap;
+
 }
 .btn-export { background: var(--lazur, #2764AE); color: white; border: none; border-radius: 8px; padding: 8px 16px; cursor: pointer; font-weight: 600; font-size: 13px; }
 .btn-refresh { background: transparent; border: 1px solid var(--border, #E2E8F0); border-radius: 8px; padding: 8px 14px; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--lazur, #2764AE); }

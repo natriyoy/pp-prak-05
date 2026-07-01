@@ -66,8 +66,9 @@
             <li><router-link to="/">Главная</router-link></li>
             <li><router-link to="/about">О компании</router-link></li>
             <li><router-link to="/services">Услуги</router-link></li>
-            <li><router-link to="/services-price">Цены</router-link></li>
             <li><router-link to="/gallery">Наши работы</router-link></li>
+            <li><router-link to="/contacts">Контакты</router-link></li>
+
           </ul>
         </div>
 

@@ -22,8 +22,8 @@
             <span class="mini-estimate-price">{{ totalCost.toLocaleString() }} ₽</span>
           </div>
           <div class="mini-estimate3">
-            <a href="/calculator" class="btn btn-primary">Полный расчет</a>
-            <a href="/calculator" class="btn btn-primary">Заказать выезд специалиста</a>
+            <router-link to="/calculator" class="btn btn-primary">Полный расчет</router-link>
+            <router-link to="/contacts" class="btn btn-primary">Заказать выезд специалиста</router-link>
           </div>
           <div class="mini-notice">
             <p><strong>Точную стоимость</strong> рассчитает наш специалист после бесплатного выезда на ваш участок</p>

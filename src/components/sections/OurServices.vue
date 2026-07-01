@@ -77,13 +77,16 @@
                   </div>
                 </div>
               </div>
+              <router-link to="/calculator" class="action-button">
 
-              <a href="services_prise.html#zayvka" class="action-button">
-                <div  class="action-button__text">Заказать расчёт</div>
+
+                <div   class="action-button__text">Заказать расчёт</div>
                 <svg class="action-button__icon" viewBox="0 0 24 24" width="18" height="18">
                   <path d="M9 18L15 12L9 6V18Z" fill="white"/>
                 </svg>
-              </a>
+
+              </router-link>
+
 
               <div class="offer-note">
                 <small>Фиксированная цена. Без скрытых платежей.</small>
@@ -104,7 +107,7 @@
             <h3 class="service-card__title">Бурение скважин</h3>
             <p class="service-card__description">Профессиональное бурение скважин глубиной до 150 метров с использованием современного оборудования для частного и коммерческого использования.</p>
           </div>
-          <a href="/services" class="service-card__button">Подробнее</a>
+          <router-link to="/services" class="service-card__button">Подробнее</router-link>
         </div>
 
         <div class="service-card">
@@ -121,7 +124,7 @@
             <h3 class="service-card__title">Монтаж насосов</h3>
             <p class="service-card__description">Установка, подключение и настройка насосных систем любого типа с гарантией на работы и оборудование.</p>
           </div>
-          <a href="/services" class="service-card__button">Подробнее</a>
+          <router-link to="/services" class="service-card__button">Подробнее</router-link>
         </div>
 
 
@@ -140,7 +143,7 @@
             <h3 class="service-card__title">Чистка и ремонт</h3>
             <p class="service-card__description">Восстановление производительности и чистка скважин от песка, ила и других загрязнений профессиональным оборудованием.</p>
           </div>
-          <a href="/services" class="service-card__button">Подробнее</a>
+          <router-link to="/services" class="service-card__button">Подробнее</router-link>
         </div>
 
         <div class="service-card">
@@ -157,13 +160,13 @@
             <h3 class="service-card__title">Обустройство скважины</h3>
             <p class="service-card__description">Комплекс работ по установке защитных систем и подключению коммуникаций для круглогодичного использования скважины.</p>
           </div>
-          <a href="/services" class="service-card__button">Подробнее</a>
+          <router-link to="/services" class="service-card__button">Подробнее</router-link>
         </div>
       </div>
     </div>
     <div class="services-footer">
       <p class="services-note">Все работы выполняются с гарантией качества и в соответствии с техническими нормативами.</p>
-      <a href="services_prise.html#zayvka" class="services-cta">Заказать консультацию</a>
+      <router-link to="/calculator" class="services-cta">Заказать консультацию</router-link>
     </div>
   </section>
 </template>
